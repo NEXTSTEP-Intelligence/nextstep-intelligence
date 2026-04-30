@@ -1,3 +1,110 @@
+#!/bin/bash
+cd ~/nextstep-intelligence
+echo "v0.1.5 – Score 0-100, sortering og stars endpoint..."
+
+# Fix backend leads router med sortering og stars
+cat > backend/routers/leads.py << 'ENDOFFILE'
+from fastapi import APIRouter
+from services.db_service import get_leads, increment_stars
+
+router = APIRouter(prefix="/leads", tags=["leads"])
+
+@router.get("")
+async def list_leads(module: str = None, limit: int = 20, sort: str = "score"):
+    leads = await get_leads(module=module, limit=limit, sort=sort)
+    for lead in leads:
+        if 'stars' not in lead:
+            lead['stars'] = 0
+    return {"leads": leads}
+
+@router.post("/{lead_id}/star")
+async def star_lead(lead_id: str):
+    stars = await increment_stars(lead_id)
+    return {"stars": stars}
+ENDOFFILE
+echo "✓ leads.py – sortering + stars"
+
+# Fix db_service med sortering og increment_stars
+cat > backend/services/db_service.py << 'ENDOFFILE'
+import os
+from supabase import create_client, Client
+
+_client: Client | None = None
+
+def get_client() -> Client:
+    global _client
+    if not _client:
+        url = os.getenv("SUPABASE_URL")
+        key = os.getenv("SUPABASE_KEY")
+        if url and key:
+            _client = create_client(url, key)
+    return _client
+
+async def get_leads(module: str = None, limit: int = 20, sort: str = "score") -> list:
+    client = get_client()
+    if not client:
+        return []
+    try:
+        sort_column = "created_at" if sort == "date" else "stars" if sort == "stars" else "score"
+        query = client.table("leads").select("*").order(sort_column, desc=True).limit(limit)
+        if module:
+            query = query.eq("module", module)
+        return (query.execute()).data or []
+    except Exception as e:
+        print(f"DB fejl: {e}")
+        return []
+
+async def save_lead(lead: dict) -> bool:
+    client = get_client()
+    if not client:
+        return False
+    try:
+        client.table("leads").insert(lead).execute()
+        return True
+    except Exception as e:
+        print(f"Gem fejl: {e}")
+        return False
+
+async def article_exists(url: str) -> bool:
+    client = get_client()
+    if not client:
+        return False
+    try:
+        result = client.table("leads").select("id").eq("url", url).execute()
+        return len(result.data) > 0
+    except:
+        return False
+
+async def increment_stars(lead_id: str) -> int:
+    client = get_client()
+    if not client:
+        return 0
+    try:
+        result = client.table("leads").select("stars").eq("id", lead_id).execute()
+        current = result.data[0].get("stars", 0) if result.data else 0
+        new_stars = current + 1
+        client.table("leads").update({"stars": new_stars}).eq("id", lead_id).execute()
+        return new_stars
+    except Exception as e:
+        print(f"Star fejl: {e}")
+        return 0
+ENDOFFILE
+echo "✓ db_service.py – sortering + increment_stars"
+
+# Opdater scraper prompt til 0-100 score
+python3.12 -c "
+path = '/Users/rmk/nextstep-intelligence/backend/services/scraper_service.py'
+content = open(path).read()
+content = content.replace(
+    '\"score\": 1-10,',
+    '\"score\": 0-100 (41-60=svagt lead, 61-80=godt lead, 81-100=stærkt lead. Returner kun relevant=true hvis score er over 40),'
+)
+open(path, 'w').write(content)
+print('✓ scraper_service.py – score 0-100')
+"
+
+# Tilføj sortering i dashboard frontend
+cat > frontend/app/dashboard/page.tsx << 'ENDOFFILE'
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -188,3 +295,8 @@ export default function Dashboard() {
     </>
   )
 }
+ENDOFFILE
+echo "✓ dashboard/page.tsx – sortering + 0-100 demo scores"
+
+echo ""
+echo "✅ v0.1.5 klar!"

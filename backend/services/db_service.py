@@ -12,12 +12,13 @@ def get_client() -> Client:
             _client = create_client(url, key)
     return _client
 
-async def get_leads(module: str = None, limit: int = 20) -> list:
+async def get_leads(module: str = None, limit: int = 20, sort: str = "score") -> list:
     client = get_client()
     if not client:
         return []
     try:
-        query = client.table("leads").select("*").order("score", desc=True).limit(limit)
+        sort_column = "created_at" if sort == "date" else "stars" if sort == "stars" else "score"
+        query = client.table("leads").select("*").order(sort_column, desc=True).limit(limit)
         if module:
             query = query.eq("module", module)
         return (query.execute()).data or []

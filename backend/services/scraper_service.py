@@ -72,7 +72,7 @@ Svar KUN med JSON i dette format (eller null hvis ikke relevant):
   "module": "public_affairs" eller "velfaerd",
   "opgave_type": "Alliance", "Camp" eller "Entreprenør",
   "sector": "primær sektor",
-  "score": 1-10,
+  "score": 0-100 (41-60=svagt lead, 61-80=godt lead, 81-100=stærkt lead. Returner kun relevant=true hvis score er over 40),
   "size_info": "antal ansatte eller borgere hvis nævnt",
   "stakeholders": [{{"name": "navn", "role": "rolle i sagen"}}],
   "potential_partners": [{{"name": "navn", "role": "hvorfor relevant"}}],
