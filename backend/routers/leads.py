@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from services.db_service import get_leads, increment_stars
+from services.db_service import get_leads, toggle_star, reset_all_stars
 
 router = APIRouter(prefix="/leads", tags=["leads"])
 
@@ -12,6 +12,12 @@ async def list_leads(module: str = None, limit: int = 20, sort: str = "score"):
     return {"leads": leads}
 
 @router.post("/{lead_id}/star")
-async def star_lead(lead_id: str):
-    stars = await increment_stars(lead_id)
-    return {"stars": stars}
+async def star_lead(lead_id: str, body: dict = {}):
+    currently_starred = body.get("currently_starred", False)
+    result = await toggle_star(lead_id, currently_starred)
+    return result
+
+@router.post("/reset-stars")
+async def reset_stars():
+    await reset_all_stars()
+    return {"status": "ok"}

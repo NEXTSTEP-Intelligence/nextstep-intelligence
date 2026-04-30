@@ -1,30 +1,42 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 type Props = {
   leadId: string
   initialStars: number
-  onStarred?: (stars: number) => void
+  onToggle?: (stars: number, starred: boolean) => void
 }
 
-export default function StarButton({ leadId, initialStars, onStarred }: Props) {
+export default function StarButton({ leadId, initialStars, onToggle }: Props) {
   const [stars, setStars] = useState(initialStars || 0)
-  const [loading, setLoading] = useState(false)
   const [starred, setStarred] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [animating, setAnimating] = useState(false)
 
-  const handleStar = async (e: React.MouseEvent) => {
+  useEffect(() => {
+    const hasStarred = localStorage.getItem(`star_${leadId}`) === 'true'
+    setStarred(hasStarred)
+  }, [leadId])
+
+  const handleToggle = async (e: React.MouseEvent) => {
     e.stopPropagation()
     if (loading) return
     setLoading(true)
+    setAnimating(true)
+    setTimeout(() => setAnimating(false), 300)
     try {
-      const res = await fetch(`/api/leads/${leadId}/star`, { method: 'POST' })
+      const res = await fetch(`/api/leads/${leadId}/star`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currently_starred: starred }),
+      })
       const data = await res.json()
       setStars(data.stars)
-      setStarred(true)
-      onStarred?.(data.stars)
-      setTimeout(() => setStarred(false), 1500)
+      setStarred(data.starred)
+      localStorage.setItem(`star_${leadId}`, data.starred ? 'true' : 'false')
+      onToggle?.(data.stars, data.starred)
     } catch {
-      console.error('Star fejl')
+      console.error('Star toggle fejl')
     } finally {
       setLoading(false)
     }
@@ -32,24 +44,26 @@ export default function StarButton({ leadId, initialStars, onStarred }: Props) {
 
   return (
     <button
-      onClick={handleStar}
+      onClick={handleToggle}
       disabled={loading}
-      title="Stjernemarkér dette lead"
+      title={starred ? 'Fjern stjernemarkeringen' : 'Stjernemarkér dette lead'}
       style={{
         border: 'none',
-        background: 'none',
+        background: starred ? 'var(--gold-bg)' : 'transparent',
         cursor: loading ? 'default' : 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 4,
-        padding: '4px 6px',
-        borderRadius: 6,
-        transition: 'background 0.15s',
-        color: stars > 0 ? '#b8963e' : 'var(--ink-3)',
+        display: 'flex', alignItems: 'center', gap: 4,
+        padding: '4px 8px', borderRadius: 6,
+        transition: 'all 0.15s',
+        color: starred ? '#b8963e' : 'var(--ink-3)',
       }}
     >
-      <span style={{ fontSize: 16, transition: 'transform 0.2s', transform: starred ? 'scale(1.4)' : 'scale(1)' }}>
-        {stars > 0 ? '★' : '☆'}
+      <span style={{
+        fontSize: 16,
+        transition: 'transform 0.2s',
+        transform: animating ? 'scale(1.5)' : 'scale(1)',
+        display: 'inline-block',
+      }}>
+        {starred ? '★' : '☆'}
       </span>
       {stars > 0 && (
         <span style={{ fontSize: 11, fontWeight: 600, color: '#b8963e' }}>{stars}</span>

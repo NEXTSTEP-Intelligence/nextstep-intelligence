@@ -47,6 +47,38 @@ async def article_exists(url: str) -> bool:
     except:
         return False
 
+async def toggle_star(lead_id: str, currently_starred: bool) -> dict:
+    client = get_client()
+    if not client:
+        return {"stars": 0, "starred": False}
+    try:
+        result = client.table("leads").select("stars").eq("id", lead_id).execute()
+        if not result.data:
+            return {"stars": 0, "starred": False}
+        current = result.data[0].get("stars", 0) or 0
+        if currently_starred:
+            new_stars = max(0, current - 1)
+            starred = False
+        else:
+            new_stars = current + 1
+            starred = True
+        client.table("leads").update({"stars": new_stars}).eq("id", lead_id).execute()
+        return {"stars": new_stars, "starred": starred}
+    except Exception as e:
+        print(f"Toggle star fejl: {e}")
+        return {"stars": 0, "starred": False}
+
+async def reset_all_stars() -> bool:
+    client = get_client()
+    if not client:
+        return False
+    try:
+        client.table("leads").update({"stars": 0}).neq("stars", -1).execute()
+        return True
+    except Exception as e:
+        print(f"Reset stars fejl: {e}")
+        return False
+
 async def increment_stars(lead_id: str) -> int:
     client = get_client()
     if not client:
