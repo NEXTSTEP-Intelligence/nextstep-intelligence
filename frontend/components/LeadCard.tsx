@@ -58,7 +58,7 @@ export default function LeadCard({ lead }: Props) {
           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.01em', lineHeight: 1.4 }}>{lead.title}</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <StarButton leadId={lead.id} initialStars={stars} onStarred={setStars} />
+          <StarButton leadId={lead.id} initialStars={stars} onToggle={(s) => setStars(s)} />
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: 10, color: 'var(--ink-3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Score</div>
             <div style={{ fontSize: 22, fontWeight: 700, color: mc.score, letterSpacing: '-0.02em', lineHeight: 1.1 }}>{lead.score}</div>
