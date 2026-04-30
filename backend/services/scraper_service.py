@@ -39,7 +39,7 @@ async def run_scraper() -> int:
     for feed_info in RSS_FEEDS:
         try:
             feed = feedparser.parse(feed_info["url"])
-            for entry in feed.entries[:20]:
+            for entry in feed.entries[:5]:
                 article = {
                     "title": entry.get("title", ""),
                     "summary": entry.get("summary", entry.get("description", "")),
