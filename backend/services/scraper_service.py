@@ -4,6 +4,7 @@ import json
 import os
 from datetime import datetime
 from services.db_service import save_lead, article_exists, find_existing_lead, update_lead
+from services.cvr_service import lookup_cvr
 
 # Danske nyhedskilder - RSS feeds (Fase 1)
 RSS_FEEDS = [

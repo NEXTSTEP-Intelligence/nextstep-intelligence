@@ -337,7 +337,7 @@ function CompactLead({ lead, priority }: { lead: Lead; priority?: boolean }) {
       </div>
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
         <div style={{ fontSize: 8, color: '#ccc', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Score</div>
-        <div style={{ fontSize: 22, fontWeight: 800, color: mc.color, letterSpacing: '-0.02em' }}>{lead.score}</div>
+        <div style={{ fontSize: 22, fontWeight: 800, color: '#0d1b2e', letterSpacing: '-0.02em' }}>{lead.score}</div>
       </div>
     </div>
   )
