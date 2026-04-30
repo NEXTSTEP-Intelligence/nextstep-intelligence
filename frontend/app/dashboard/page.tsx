@@ -108,7 +108,20 @@ export default function Dashboard() {
 
   const fetchLeads = (sortBy: string) => {
     fetch(`/api/leads?sort=${sortBy}&days=${activeDays}`).then(r => r.json()).then(d => {
-      if (d.leads?.length) setLeads(d.leads)
+      if (d.leads?.length) {
+        setLeads(d.leads)
+        // Hvis klientlinse er aktiv, re-analyser med nye leads
+        const savedClient = localStorage.getItem('klientlinse_client')
+        if (savedClient) {
+          fetch('/api/klientlinse/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ client_name: savedClient }),
+          }).then(r => r.json()).then(d => {
+            if (d.leads?.length) setClientLeads(d.leads)
+          }).catch(() => {})
+        }
+      }
     }).catch(() => {})
   }
 
