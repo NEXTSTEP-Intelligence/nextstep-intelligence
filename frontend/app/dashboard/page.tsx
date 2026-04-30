@@ -30,6 +30,8 @@ export type Lead = {
   url: string
   score: number
   stars: number
+  update_count?: number
+  entity?: string
   cvr_verified: boolean
   size_info: string
   stakeholders: { name: string; role: string }[]

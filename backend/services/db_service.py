@@ -126,3 +126,34 @@ async def save_report_emails(emails: list) -> bool:
     except Exception as e:
         print(f"Save emails fejl: {e}")
         return False
+
+async def find_existing_lead(entity: str, days: int = 30) -> dict | None:
+    client = get_client()
+    if not client or not entity:
+        return None
+    try:
+        from datetime import datetime, timedelta, timezone
+        since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+        result = client.table("leads").select("*") \
+            .ilike("entity", f"%{entity}%") \
+            .gte("created_at", since) \
+            .order("score", desc=True) \
+            .limit(1) \
+            .execute()
+        return result.data[0] if result.data else None
+    except Exception as e:
+        print(f"Find entity fejl: {e}")
+        return None
+
+async def update_lead(lead_id: str, updates: dict) -> bool:
+    client = get_client()
+    if not client:
+        return False
+    try:
+        from datetime import datetime, timezone
+        updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+        client.table("leads").update(updates).eq("id", lead_id).execute()
+        return True
+    except Exception as e:
+        print(f"Update lead fejl: {e}")
+        return False

@@ -3,7 +3,7 @@ import anthropic
 import json
 import os
 from datetime import datetime
-from services.db_service import save_lead, article_exists
+from services.db_service import save_lead, article_exists, find_existing_lead, update_lead
 
 # Danske nyhedskilder - RSS feeds (Fase 1)
 RSS_FEEDS = [
@@ -42,8 +42,21 @@ async def run_scraper() -> int:
     for article in all_articles:
         lead = await analyze_article(article)
         if lead:
-            await save_lead(lead)
-            new_leads += 1
+            entity = lead.get("entity", "")
+            existing = await find_existing_lead(entity) if entity else None
+            if existing:
+                new_score = max(existing.get("score", 0), lead.get("score", 0))
+                update_count = (existing.get("update_count") or 0) + 1
+                await update_lead(existing["id"], {
+                    "score": new_score,
+                    "update_count": update_count,
+                    "summary": lead.get("summary", existing.get("summary", "")),
+                    "opener": lead.get("opener", existing.get("opener", "")),
+                })
+                print(f"Opdateret: {entity} (#{update_count})")
+            else:
+                await save_lead(lead)
+                new_leads += 1
 
     print(f"Scraper færdig: {new_leads} nye leads fundet af {len(all_articles)} artikler")
     return new_leads
@@ -73,6 +86,7 @@ Svar KUN med JSON i dette format (eller null hvis ikke relevant):
   "opgave_type": "Alliance", "Camp" eller "Entreprenør",
   "sector": "primær sektor",
   "score": 0-100 (41-60=svagt lead, 61-80=godt lead, 81-100=stærkt lead. Returner kun relevant=true hvis score er over 40),
+  "entity": "primær virksomhed eller organisation (kun ét navn)",
   "size_info": "antal ansatte eller borgere hvis nævnt",
   "stakeholders": [{{"name": "navn", "role": "rolle i sagen"}}],
   "potential_partners": [{{"name": "navn", "role": "hvorfor relevant"}}],
