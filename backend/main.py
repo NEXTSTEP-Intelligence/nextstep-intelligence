@@ -5,7 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from contextlib import asynccontextmanager
 import os
 
-from routers import leads, scraper, reports
+from routers import leads, scraper, reports, settings
 from services.scraper_service import run_scraper
 
 load_dotenv()
@@ -25,6 +25,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 app.include_router(leads.router)
 app.include_router(scraper.router)
 app.include_router(reports.router)
+app.include_router(settings.router)
 
 @app.get("/health")
 def health():

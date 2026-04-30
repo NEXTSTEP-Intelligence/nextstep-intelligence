@@ -1,3 +1,15 @@
+#!/bin/bash
+cd ~/nextstep-intelligence
+echo "v0.1.8 – Premium rapport + hexagon + email-indstillinger..."
+
+# Kopiér logo til frontend/public
+mkdir -p frontend/public
+cp ~/nextstep-intelligence/frontend/public/nextstep-logo.png frontend/public/nextstep-logo.png 2>/dev/null || echo "Logo skal kopieres manuelt til frontend/public/"
+
+# Opret rapport-siden med premium design
+mkdir -p frontend/app/rapport
+
+cat > frontend/app/rapport/page.tsx << 'ENDOFFILE'
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -264,3 +276,209 @@ function CompactLead({ lead, priority }: { lead: Lead; priority?: boolean }) {
     </div>
   )
 }
+ENDOFFILE
+echo "✓ rapport/page.tsx – premium design"
+
+# Opret email-indstillinger side
+mkdir -p frontend/app/indstillinger
+
+cat > frontend/app/indstillinger/page.tsx << 'ENDOFFILE'
+'use client'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+
+export default function IndstillingerPage() {
+  const router = useRouter()
+  const [emails, setEmails] = useState<string[]>([])
+  const [newEmail, setNewEmail] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+
+  useEffect(() => {
+    const auth = localStorage.getItem('ns_auth')
+    if (!auth) { router.push('/'); return }
+    fetch('/api/settings/emails')
+      .then(r => r.json())
+      .then(d => { setEmails(d.emails || []); setLoading(false) })
+      .catch(() => { setEmails(['rasmus@nextstep.one']); setLoading(false) })
+  }, [])
+
+  const addEmail = () => {
+    if (!newEmail || !newEmail.includes('@')) return
+    if (emails.includes(newEmail)) return
+    setEmails([...emails, newEmail])
+    setNewEmail('')
+  }
+
+  const removeEmail = (email: string) => {
+    setEmails(emails.filter(e => e !== email))
+  }
+
+  const saveEmails = async () => {
+    setSaving(true)
+    try {
+      await fetch('/api/settings/emails', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ emails }),
+      })
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch { alert('Fejl – prøv igen') }
+    finally { setSaving(false) }
+  }
+
+  return (
+    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '32px' }}>
+      <div style={{ maxWidth: 560, margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 32 }}>
+          <button onClick={() => router.push('/dashboard')} style={{ fontSize: 12, padding: '7px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'var(--surface)', color: 'var(--ink)', cursor: 'pointer' }}>
+            ← Dashboard
+          </button>
+          <h1 style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>Indstillinger</h1>
+        </div>
+
+        <div style={{ background: 'var(--surface)', borderRadius: 14, padding: '24px 28px', border: '1px solid rgba(0,0,0,0.06)' }}>
+          <h2 style={{ fontSize: 15, fontWeight: 600, marginBottom: 6 }}>Rapport-modtagere</h2>
+          <p style={{ fontSize: 12, color: 'var(--ink-3)', marginBottom: 20 }}>
+            Disse e-mailadresser modtager mandags- og torsdagsrapporten automatisk.
+          </p>
+
+          {loading ? (
+            <div style={{ color: 'var(--ink-3)', fontSize: 13 }}>Henter...</div>
+          ) : (
+            <>
+              <div style={{ marginBottom: 16 }}>
+                {emails.map(email => (
+                  <div key={email} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: 'var(--bg)', borderRadius: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: 13, color: 'var(--ink)' }}>{email}</span>
+                    <button onClick={() => removeEmail(email)} style={{ fontSize: 12, color: 'var(--ink-3)', border: 'none', background: 'none', cursor: 'pointer', padding: '2px 6px' }}>
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+                <input
+                  type="email"
+                  placeholder="navn@nextstep.one"
+                  value={newEmail}
+                  onChange={e => setNewEmail(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && addEmail()}
+                  style={{ flex: 1, padding: '9px 13px', fontSize: 13, borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'var(--bg)', color: 'var(--ink)', outline: 'none' }}
+                />
+                <button onClick={addEmail} disabled={!newEmail || !newEmail.includes('@')} style={{ fontSize: 12, fontWeight: 500, padding: '9px 16px', borderRadius: 8, border: 'none', background: newEmail.includes('@') ? 'var(--ink)' : 'rgba(0,0,0,0.08)', color: newEmail.includes('@') ? '#fff' : 'var(--ink-3)', cursor: 'pointer' }}>
+                  Tilføj
+                </button>
+              </div>
+
+              <button onClick={saveEmails} disabled={saving} style={{ width: '100%', fontSize: 13, fontWeight: 600, padding: '11px', borderRadius: 8, border: 'none', background: saved ? '#edf5f1' : 'var(--ink)', color: saved ? '#2a7d5f' : '#fff', cursor: 'pointer' }}>
+                {saving ? 'Gemmer...' : saved ? '✓ Gemt' : 'Gem ændringer'}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+ENDOFFILE
+echo "✓ indstillinger/page.tsx – email-liste"
+
+# Tilføj settings endpoints i backend
+cat > backend/routers/settings.py << 'ENDOFFILE'
+from fastapi import APIRouter
+from services.db_service import get_report_emails, save_report_emails
+
+router = APIRouter(prefix="/settings", tags=["settings"])
+
+@router.get("/emails")
+async def get_emails():
+    emails = await get_report_emails()
+    return {"emails": emails}
+
+@router.post("/emails")
+async def update_emails(body: dict):
+    emails = body.get("emails", [])
+    await save_report_emails(emails)
+    return {"status": "ok", "emails": emails}
+ENDOFFILE
+echo "✓ backend/routers/settings.py"
+
+# Tilføj settings funktioner i db_service
+python3.12 -c "
+path = '/Users/rmk/nextstep-intelligence/backend/services/db_service.py'
+content = open(path).read()
+addition = '''
+async def get_report_emails() -> list:
+    client = get_client()
+    if not client:
+        return []
+    try:
+        result = client.table(\"settings\").select(\"value\").eq(\"key\", \"report_emails\").execute()
+        if result.data:
+            import json
+            return json.loads(result.data[0][\"value\"])
+        return []
+    except Exception as e:
+        print(f\"Get emails fejl: {e}\")
+        return []
+
+async def save_report_emails(emails: list) -> bool:
+    client = get_client()
+    if not client:
+        return False
+    try:
+        import json
+        existing = client.table(\"settings\").select(\"key\").eq(\"key\", \"report_emails\").execute()
+        if existing.data:
+            client.table(\"settings\").update({\"value\": json.dumps(emails)}).eq(\"key\", \"report_emails\").execute()
+        else:
+            client.table(\"settings\").insert({\"key\": \"report_emails\", \"value\": json.dumps(emails)}).execute()
+        return True
+    except Exception as e:
+        print(f\"Save emails fejl: {e}\")
+        return False
+'''
+open(path, 'w').write(content + addition)
+print('✓ db_service.py – email settings')
+"
+
+# Opdater main.py til at inkludere settings router
+python3.12 -c "
+path = '/Users/rmk/nextstep-intelligence/backend/main.py'
+content = open(path).read()
+content = content.replace(
+    'from routers import leads, scraper, reports',
+    'from routers import leads, scraper, reports, settings'
+)
+content = content.replace(
+    'app.include_router(reports.router)',
+    'app.include_router(reports.router)\napp.include_router(settings.router)'
+)
+open(path, 'w').write(content)
+print('✓ main.py – settings router tilføjet')
+"
+
+# Opdater Sidebar til at linke til indstillinger
+python3.12 -c "
+path = '/Users/rmk/nextstep-intelligence/frontend/components/Sidebar.tsx'
+content = open(path).read()
+content = content.replace(
+    \"['Rapport-arkiv','Indstillinger'].map(s => (\",
+    \"['Rapport-arkiv'].map(s => (\"
+)
+open(path, 'w').write(content)
+print('✓ Sidebar – Indstillinger som separat link')
+"
+
+# Opret settings tabel i Supabase via SQL – vis instruktion
+echo ""
+echo "⚠️  Kør denne SQL i Supabase SQL Editor:"
+echo "create table if not exists settings (key text primary key, value text);"
+echo "grant select, insert, update on public.settings to anon;"
+echo "grant select, insert, update on public.settings to authenticated;"
+echo ""
+echo "✅ v0.1.8 klar – husk logo og Supabase SQL!"

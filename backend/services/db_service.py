@@ -92,3 +92,33 @@ async def increment_stars(lead_id: str) -> int:
     except Exception as e:
         print(f"Star fejl: {e}")
         return 0
+
+async def get_report_emails() -> list:
+    client = get_client()
+    if not client:
+        return []
+    try:
+        result = client.table("settings").select("value").eq("key", "report_emails").execute()
+        if result.data:
+            import json
+            return json.loads(result.data[0]["value"])
+        return []
+    except Exception as e:
+        print(f"Get emails fejl: {e}")
+        return []
+
+async def save_report_emails(emails: list) -> bool:
+    client = get_client()
+    if not client:
+        return False
+    try:
+        import json
+        existing = client.table("settings").select("key").eq("key", "report_emails").execute()
+        if existing.data:
+            client.table("settings").update({"value": json.dumps(emails)}).eq("key", "report_emails").execute()
+        else:
+            client.table("settings").insert({"key": "report_emails", "value": json.dumps(emails)}).execute()
+        return True
+    except Exception as e:
+        print(f"Save emails fejl: {e}")
+        return False
