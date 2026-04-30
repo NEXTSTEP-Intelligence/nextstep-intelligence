@@ -1,3 +1,34 @@
+#!/bin/bash
+cd ~/nextstep-intelligence
+echo "Fikser mobilvisning..."
+
+# Fix layout.tsx - tilføj viewport meta tag
+cat > frontend/app/layout.tsx << 'ENDOFFILE'
+import type { Metadata, Viewport } from 'next'
+import './globals.css'
+
+export const metadata: Metadata = {
+  title: 'NEXTSTEP Intelligence',
+  description: 'Scout NS · Intern lead-platform',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="da">
+      <body>{children}</body>
+    </html>
+  )
+}
+ENDOFFILE
+echo "✓ layout.tsx – viewport meta"
+
+# Fix dashboard – mobilvenligt grid og dato-formatering
+cat > frontend/app/dashboard/page.tsx << 'ENDOFFILE'
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -158,3 +189,8 @@ export default function Dashboard() {
     </>
   )
 }
+ENDOFFILE
+echo "✓ dashboard/page.tsx – mobilvenlig layout + dato-formatering"
+
+echo ""
+echo "✅ Færdig!"
