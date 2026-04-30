@@ -1,4 +1,12 @@
 
+'use client'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Sidebar from '@/components/Sidebar'
+import LeadCard from '@/components/LeadCard'
+import StatsRow from '@/components/StatsRow'
+import ReviewBanner from '@/components/ReviewBanner'
+
 function getNextRapport(): string {
   const now = new Date()
   const day = now.getDay()
@@ -9,13 +17,6 @@ function getNextRapport(): string {
   return 'Næste rapport mandag kl. 10:00'
 }
 
-'use client'
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Sidebar from '@/components/Sidebar'
-import LeadCard from '@/components/LeadCard'
-import StatsRow from '@/components/StatsRow'
-import ReviewBanner from '@/components/ReviewBanner'
 
 export type Lead = {
   id: string
