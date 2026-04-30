@@ -34,7 +34,7 @@ Svar KUN med JSON array – ét objekt per lead i samme rækkefølge:
 
     try:
         response = client.messages.create(
-            model="claude-3-haiku-20240307",
+            model="claude-sonnet-4-6",
             max_tokens=2000,
             messages=[{"role": "user", "content": prompt}]
         )
