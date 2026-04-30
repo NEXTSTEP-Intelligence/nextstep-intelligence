@@ -1,3 +1,72 @@
+#!/bin/bash
+cd ~/nextstep-intelligence
+echo "v0.1.4 – Stjernemarkeringer..."
+
+cat > frontend/components/StarButton.tsx << 'ENDOFFILE'
+'use client'
+import { useState } from 'react'
+
+type Props = {
+  leadId: string
+  initialStars: number
+  onStarred?: (stars: number) => void
+}
+
+export default function StarButton({ leadId, initialStars, onStarred }: Props) {
+  const [stars, setStars] = useState(initialStars || 0)
+  const [loading, setLoading] = useState(false)
+  const [starred, setStarred] = useState(false)
+
+  const handleStar = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (loading) return
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/leads/${leadId}/star`, { method: 'POST' })
+      const data = await res.json()
+      setStars(data.stars)
+      setStarred(true)
+      onStarred?.(data.stars)
+      setTimeout(() => setStarred(false), 1500)
+    } catch {
+      console.error('Star fejl')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <button
+      onClick={handleStar}
+      disabled={loading}
+      title="Stjernemarkér dette lead"
+      style={{
+        border: 'none',
+        background: 'none',
+        cursor: loading ? 'default' : 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+        padding: '4px 6px',
+        borderRadius: 6,
+        transition: 'background 0.15s',
+        color: stars > 0 ? '#b8963e' : 'var(--ink-3)',
+      }}
+    >
+      <span style={{ fontSize: 16, transition: 'transform 0.2s', transform: starred ? 'scale(1.4)' : 'scale(1)' }}>
+        {stars > 0 ? '★' : '☆'}
+      </span>
+      {stars > 0 && (
+        <span style={{ fontSize: 11, fontWeight: 600, color: '#b8963e' }}>{stars}</span>
+      )}
+    </button>
+  )
+}
+ENDOFFILE
+echo "✓ StarButton.tsx"
+
+# Opdater LeadCard til at inkludere StarButton
+cat > frontend/components/LeadCard.tsx << 'ENDOFFILE'
 'use client'
 import { useState } from 'react'
 import { Lead } from '@/app/dashboard/page'
@@ -108,3 +177,59 @@ export default function LeadCard({ lead }: Props) {
     </div>
   )
 }
+ENDOFFILE
+echo "✓ LeadCard.tsx – med stjerner"
+
+# Opdater Lead type i dashboard
+python3.12 -c "
+path = '/Users/rmk/nextstep-intelligence/frontend/app/dashboard/page.tsx'
+content = open(path).read()
+new = content.replace('  opener: string\n}', '  opener: string\n  stars: number\n}')
+open(path, 'w').write(new)
+print('✓ Lead type opdateret med stars felt')
+"
+
+# Tilføj star endpoint i backend
+cat > backend/routers/leads.py << 'ENDOFFILE'
+from fastapi import APIRouter
+from services.db_service import get_leads, increment_stars
+
+router = APIRouter(prefix="/leads", tags=["leads"])
+
+@router.get("")
+async def list_leads(module: str = None, limit: int = 20):
+    leads = await get_leads(module=module, limit=limit)
+    return {"leads": leads}
+
+@router.post("/{lead_id}/star")
+async def star_lead(lead_id: str):
+    stars = await increment_stars(lead_id)
+    return {"stars": stars}
+ENDOFFILE
+echo "✓ backend/routers/leads.py – star endpoint"
+
+# Tilføj increment_stars i db_service
+python3.12 -c "
+path = '/Users/rmk/nextstep-intelligence/backend/services/db_service.py'
+content = open(path).read()
+addition = '''
+async def increment_stars(lead_id: str) -> int:
+    client = get_client()
+    if not client:
+        return 0
+    try:
+        result = client.table(\"leads\").select(\"stars\").eq(\"id\", lead_id).execute()
+        current = result.data[0].get(\"stars\", 0) if result.data else 0
+        new_stars = current + 1
+        client.table(\"leads\").update({\"stars\": new_stars}).eq(\"id\", lead_id).execute()
+        return new_stars
+    except Exception as e:
+        print(f\"Star fejl: {e}\")
+        return 0
+'''
+open(path, 'w').write(content + addition)
+print('✓ db_service.py – increment_stars')
+"
+
+echo ""
+echo "✅ v0.1.4 stjernemarkeringer klar!"

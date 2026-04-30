@@ -23,6 +23,7 @@ export type Lead = {
   potential_partners: { name: string; role: string }[]
   gold_matches: { title: string; pct: number }[]
   opener: string
+  stars: number
 }
 
 const DEMO_LEADS: Lead[] = [

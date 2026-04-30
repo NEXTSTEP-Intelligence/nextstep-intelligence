@@ -45,3 +45,17 @@ async def article_exists(url: str) -> bool:
         return len(result.data) > 0
     except:
         return False
+
+async def increment_stars(lead_id: str) -> int:
+    client = get_client()
+    if not client:
+        return 0
+    try:
+        result = client.table("leads").select("stars").eq("id", lead_id).execute()
+        current = result.data[0].get("stars", 0) if result.data else 0
+        new_stars = current + 1
+        client.table("leads").update({"stars": new_stars}).eq("id", lead_id).execute()
+        return new_stars
+    except Exception as e:
+        print(f"Star fejl: {e}")
+        return 0
