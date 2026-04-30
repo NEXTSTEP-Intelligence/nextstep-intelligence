@@ -5,9 +5,10 @@ import { Lead } from '@/app/dashboard/page'
 type Props = {
   onActivate: (clientName: string, leads: Lead[]) => void
   onDeactivate: () => void
+  onLoading?: () => void
 }
 
-export default function KlientlinseBar({ onActivate, onDeactivate }: Props) {
+export default function KlientlinseBar({ onActivate, onDeactivate { onActivate, onDeactivate, onLoading }: Props) {
   const [clientName, setClientName] = useState('')
   const [active, setActive] = useState(false)
   const [activeClient, setActiveClient] = useState('')
@@ -92,7 +93,7 @@ export default function KlientlinseBar({ onActivate, onDeactivate }: Props) {
             disabled={loading || !clientName.trim()}
             style={{ fontSize: 12, fontWeight: 500, padding: '7px 16px', borderRadius: 6, border: 'none', background: clientName.trim() ? '#0d1b2e' : 'rgba(0,0,0,0.06)', color: clientName.trim() ? '#e8d08a' : 'var(--ink-3)', cursor: clientName.trim() ? 'pointer' : 'default', whiteSpace: 'nowrap' }}
           >
-            {loading ? 'Analyserer...' : 'Tag deres briller på →'}
+            {loading ? '⏳ Analyserer med AI...' : 'Tag deres briller på →'}
           </button>
         </div>
       )}

@@ -105,6 +105,7 @@ export default function Dashboard() {
   const [activeDays, setActiveDays] = useState(7)
   const [clientLeads, setClientLeads] = useState<Lead[] | null>(null)
   const [clientName, setClientName] = useState('')
+  const [clientLoading, setClientLoading] = useState(false)
 
   const fetchLeads = (sortBy: string) => {
     fetch(`/api/leads?sort=${sortBy}&days=${activeDays}`).then(r => r.json()).then(d => {
@@ -203,8 +204,9 @@ export default function Dashboard() {
 
           <ReviewBanner />
           <KlientlinseBar
-            onActivate={(name, leads) => { setClientName(name); setClientLeads(leads) }}
-            onDeactivate={() => { setClientName(''); setClientLeads(null) }}
+            onActivate={(name, leads) => { setClientName(name); setClientLeads(leads); setClientLoading(false) }}
+            onDeactivate={() => { setClientName(''); setClientLeads(null); setClientLoading(false) }}
+            onLoading={() => setClientLoading(true)}
           />
           <StatsRow total={leads.length} pa={pa} vel={vel} rebizz={rebizz} onDaysChange={handleDays} activeDays={activeDays} />
 
@@ -240,7 +242,9 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {leadsWithFormattedDates.map(lead => <LeadCard key={lead.id} lead={lead} />)}
+          {clientLoading ? (
+            <div style={{ textAlign: 'center', padding: 40, color: 'var(--ink-3)', fontSize: 13 }}>⏳ Analyserer leads fra {clientName}s perspektiv...</div>
+          ) : leadsWithFormattedDates.map(lead => <LeadCard key={lead.id} lead={lead} />)}
           {filtered.length === 0 && <div style={{ textAlign: 'center', padding: 60, color: 'var(--ink-3)', fontSize: 14 }}>Ingen leads matcher filteret.</div>}
         </main>
       </div>
