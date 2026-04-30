@@ -6,6 +6,7 @@ import Sidebar from '@/components/Sidebar'
 import LeadCard from '@/components/LeadCard'
 import StatsRow from '@/components/StatsRow'
 import ReviewBanner from '@/components/ReviewBanner'
+import KlientlinseBar from '@/components/KlientlinseBar'
 
 function getNextRapport(): string {
   const now = new Date()
@@ -32,6 +33,9 @@ export type Lead = {
   stars: number
   update_count?: number
   entity?: string
+  client_score?: number
+  client_opener?: string
+  client_relevance?: string
   cvr_verified: boolean
   size_info: string
   stakeholders: { name: string; role: string }[]
@@ -99,6 +103,8 @@ export default function Dashboard() {
   const [sort, setSort] = useState('score')
   const [activeModule, setActiveModule] = useState('alle')
   const [activeDays, setActiveDays] = useState(7)
+  const [clientLeads, setClientLeads] = useState<Lead[] | null>(null)
+  const [clientName, setClientName] = useState('')
 
   const fetchLeads = (sortBy: string) => {
     fetch(`/api/leads?sort=${sortBy}&days=${activeDays}`).then(r => r.json()).then(d => {
@@ -125,7 +131,8 @@ export default function Dashboard() {
     fetchLeads(s)
   }
 
-  const filtered = leads.filter(l => {
+  const displayLeads = clientLeads || leads
+  const filtered = displayLeads.filter(l => {
     if (activeModule === 'pa') return l.module === 'public_affairs'
     if (activeModule === 'vel') return l.module === 'velfaerd'
     if (filter === 'rebizz') return l.gold_matches?.length > 0
@@ -170,6 +177,10 @@ export default function Dashboard() {
           </div>
 
           <ReviewBanner />
+          <KlientlinseBar
+            onActivate={(name, leads) => { setClientName(name); setClientLeads(leads) }}
+            onDeactivate={() => { setClientName(''); setClientLeads(null) }}
+          />
           <StatsRow total={leads.length} pa={pa} vel={vel} rebizz={rebizz} onDaysChange={handleDays} activeDays={activeDays} />
 
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', margin: '18px 0 10px', alignItems: 'center', justifyContent: 'space-between' }}>

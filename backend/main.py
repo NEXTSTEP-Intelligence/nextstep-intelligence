@@ -5,7 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from contextlib import asynccontextmanager
 import os
 
-from routers import leads, scraper, reports, settings
+from routers import leads, scraper, reports, settings, klientlinse
 from services.scraper_service import run_scraper
 
 load_dotenv()
@@ -26,6 +26,7 @@ app.include_router(leads.router)
 app.include_router(scraper.router)
 app.include_router(reports.router)
 app.include_router(settings.router)
+app.include_router(klientlinse.router)
 
 @app.get("/health")
 def health():
