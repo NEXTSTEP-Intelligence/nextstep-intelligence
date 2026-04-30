@@ -1,3 +1,9 @@
+#!/bin/bash
+cd ~/nextstep-intelligence
+echo "Opdaterer filer..."
+
+# LeadCard – tilføj artikellink og omdøb "Åbner" til "Vej ind"
+cat > frontend/components/LeadCard.tsx << 'EOF'
 import { Lead } from '@/app/dashboard/page'
 type Props = { lead: Lead }
 const MC = {
@@ -85,3 +91,28 @@ export default function LeadCard({ lead }: Props) {
     </div>
   )
 }
+EOF
+echo "✓ LeadCard.tsx – artikellink + Vej ind"
+
+# ReviewBanner – opdater navne
+cat > frontend/components/ReviewBanner.tsx << 'EOF'
+export default function ReviewBanner() {
+  return (
+    <div style={{ background: 'var(--gold-bg)', border: '1px solid rgba(184,150,62,0.25)', borderRadius: 'var(--radius-md)', padding: '12px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, marginBottom: 20 }}>
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>Torsdagsrapport klar til review</div>
+        <div style={{ fontSize: 11, color: 'var(--ink-2)', marginTop: 2 }}>
+          4 leads · Afventer godkendelse fra Claus eller Rasmus inden udsendelse
+        </div>
+      </div>
+      <button style={{ fontSize: 12, fontWeight: 500, padding: '7px 18px', borderRadius: 8, border: 'none', background: 'var(--gold)', color: '#fff', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+        Se &amp; godkend
+      </button>
+    </div>
+  )
+}
+EOF
+echo "✓ ReviewBanner.tsx – Claus eller Rasmus"
+
+echo ""
+echo "✅ Færdig. Genindlæs browseren for at se ændringerne."
