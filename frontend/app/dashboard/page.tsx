@@ -13,7 +13,7 @@ function getNextRapport(): string {
   const hour = now.getHours()
   if (day === 1 && hour < 10) return 'Mandagsrapport sendes om lidt'
   if (day === 4 && hour < 8) return 'Torsdagsrapport sendes om lidt'
-  if (day >= 1 && day <= 3) return '{getNextRapport()}'
+  if (day >= 1 && day <= 3) return 'Næste rapport torsdag kl. 08:30'
   return 'Næste rapport mandag kl. 10:00'
 }
 
