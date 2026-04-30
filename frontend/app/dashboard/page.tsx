@@ -116,6 +116,18 @@ export default function Dashboard() {
     const auth = localStorage.getItem('ns_auth')
     if (!auth) { router.push('/'); return }
     fetchLeads(sort)
+    // Gendan klientlinse hvis gemt
+    const savedClient = localStorage.getItem('klientlinse_client')
+    if (savedClient) {
+      setClientName(savedClient)
+      fetch('/api/klientlinse/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_name: savedClient }),
+      }).then(r => r.json()).then(d => {
+        if (d.leads?.length) setClientLeads(d.leads)
+      }).catch(() => {})
+    }
   }, [])
 
   const handleDays = (d: number) => {
