@@ -1,11 +1,12 @@
 from fastapi import APIRouter
 from services.db_service import get_leads, toggle_star, reset_all_stars
+from datetime import datetime, timedelta
 
 router = APIRouter(prefix="/leads", tags=["leads"])
 
 @router.get("")
-async def list_leads(module: str = None, limit: int = 20, sort: str = "score"):
-    leads = await get_leads(module=module, limit=limit, sort=sort)
+async def list_leads(module: str = None, limit: int = 20, sort: str = "score", days: int = None):
+    leads = await get_leads(module=module, limit=limit, sort=sort, days=days)
     for lead in leads:
         if 'stars' not in lead:
             lead['stars'] = 0

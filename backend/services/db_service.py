@@ -12,15 +12,19 @@ def get_client() -> Client:
             _client = create_client(url, key)
     return _client
 
-async def get_leads(module: str = None, limit: int = 20, sort: str = "score") -> list:
+async def get_leads(module: str = None, limit: int = 20, sort: str = "score", days: int = None) -> list:
     client = get_client()
     if not client:
         return []
     try:
+        from datetime import datetime, timedelta, timezone
         sort_column = "created_at" if sort == "date" else "stars" if sort == "stars" else "score"
         query = client.table("leads").select("*").order(sort_column, desc=True).limit(limit)
         if module:
             query = query.eq("module", module)
+        if days:
+            since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+            query = query.gte("created_at", since)
         return (query.execute()).data or []
     except Exception as e:
         print(f"DB fejl: {e}")
