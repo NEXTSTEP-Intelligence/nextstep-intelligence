@@ -13,7 +13,7 @@ function getNextRapport(): string {
   const hour = now.getHours()
   if (day === 1 && hour < 10) return 'Mandagsrapport sendes om lidt'
   if (day === 4 && hour < 8) return 'Torsdagsrapport sendes om lidt'
-  if (day >= 1 && day <= 3) return 'Næste rapport torsdag kl. 08:30'
+  if (day >= 1 && day <= 3) return '{getNextRapport()}'
   return 'Næste rapport mandag kl. 10:00'
 }
 
@@ -159,7 +159,7 @@ export default function Dashboard() {
             <div>
               <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em' }}>Uge {week} · {now.getFullYear()}</h1>
               <p style={{ fontSize: 12, color: 'var(--ink-3)', marginTop: 4 }}>
-                Opdateret kl. {String(now.getHours()).padStart(2,'0')}:{String(now.getMinutes()).padStart(2,'0')} · ' + getNextRapport() + '
+                Opdateret kl. {String(now.getHours()).padStart(2,'0')}:{String(now.getMinutes()).padStart(2,'0')} · {`${getNextRapport()}`}
               </p>
             </div>
             <button style={{ fontSize: 12, fontWeight: 500, padding: '8px 18px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(0,0,0,0.12)', background: 'var(--surface)', color: 'var(--ink)', whiteSpace: 'nowrap' }}>
