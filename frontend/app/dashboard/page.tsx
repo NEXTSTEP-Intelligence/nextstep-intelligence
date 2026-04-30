@@ -30,6 +30,7 @@ const DEMO_LEADS: Lead[] = [
   {
     id: '1',
     url: '',
+    stars: 0,
     title: 'NKT A/S søger politisk opbakning til nyt datacenter i Silkeborg',
     summary: 'Virksomheden ønsker at bygge et 400 MW AI-datacenter men møder modstand fra lokalpolitikere om arealplanlægning og strømforsyning. Ingen intern PA-kapabilitet identificeret.',
     module: 'public_affairs', opgave_type: 'Alliance', sector: 'Energi',
@@ -48,6 +49,7 @@ const DEMO_LEADS: Lead[] = [
   {
     id: '2',
     url: '',
+    stars: 0,
     title: 'Vejle Kommune skal implementere ældrepleje-reform inden udgangen af 2026',
     summary: 'Kommunen er bagud på KLs benchmarks og har ingen intern kapacitet til at drive processen.',
     module: 'velfaerd', opgave_type: 'Camp', sector: 'Sundhed',
