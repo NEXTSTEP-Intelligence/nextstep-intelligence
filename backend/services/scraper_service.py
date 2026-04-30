@@ -8,10 +8,23 @@ from services.db_service import save_lead, article_exists, find_existing_lead, u
 # Danske nyhedskilder - RSS feeds (Fase 1)
 RSS_FEEDS = [
     {"name": "Altinget", "url": "https://www.altinget.dk/rss/altinget.rss"},
+    {"name": "Altinget Sundhed", "url": "https://www.altinget.dk/rss/sundhed.rss"},
+    {"name": "Altinget Miljoe", "url": "https://www.altinget.dk/rss/miljoe.rss"},
+    {"name": "Altinget Foedevarer", "url": "https://www.altinget.dk/rss/foedevarer.rss"},
+    {"name": "Altinget Europa", "url": "https://www.altinget.dk/rss/europa.rss"},
+    {"name": "Altinget Kommune", "url": "https://www.altinget.dk/rss/kommune.rss"},
+    {"name": "Altinget Klima", "url": "https://www.altinget.dk/rss/klima.rss"},
+    {"name": "Altinget Arbejdsmarked", "url": "https://www.altinget.dk/rss/arbejdsmarked.rss"},
     {"name": "DR Nyheder", "url": "https://www.dr.dk/nyheder/service/feeds/allenyheder"},
-    {"name": "Ritzau", "url": "https://ritzau.dk/feed/"},
+    {"name": "DR Politik", "url": "https://www.dr.dk/nyheder/service/feeds/politik"},
+    {"name": "DR Penge", "url": "https://www.dr.dk/nyheder/service/feeds/penge"},
     {"name": "Politiken", "url": "https://politiken.dk/rss/"},
-    {"name": "Børsen", "url": "https://borsen.dk/rss"},
+    {"name": "Boersen", "url": "https://borsen.dk/rss"},
+    {"name": "Jyllands-Posten", "url": "https://jyllands-posten.dk/rss/"},
+    {"name": "Information", "url": "https://www.information.dk/rss"},
+    {"name": "Momentum", "url": "https://www.momentum.dk/feed/"},
+    {"name": "Ingenioren", "url": "https://ing.dk/rss"},
+    {"name": "Altinget Forsvaret", "url": "https://www.altinget.dk/rss/forsvaret.rss"},
 ]
 
 SECTORS = ["sundhed", "fødevarer", "energi", "forsyning", "klima", "kommuner", "velfærd", "regulering", "miljø", "sociale forhold"]
