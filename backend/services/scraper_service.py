@@ -46,6 +46,7 @@ async def run_scraper() -> int:
                     "url": entry.get("link", ""),
                     "source": feed_info["name"],
                     "published": entry.get("published", str(datetime.now())),
+                    "published_parsed": entry.get("published_parsed", None),
                 }
                 if article["title"] and not await article_exists(article["url"]):
                     all_articles.append(article)
