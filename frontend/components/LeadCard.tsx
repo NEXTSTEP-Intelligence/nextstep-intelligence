@@ -101,7 +101,7 @@ export default function LeadCard({ lead }: Props) {
               </div>
             )}
             <div style={{ fontSize: 12, color: 'var(--ink-3)' }}>Vej ind: <span style={{ color: 'var(--ink)', fontWeight: 500 }}>{lead.opener}</span></div>
-            <div style={{ fontSize: 10, color: 'var(--ink-3)', marginLeft: 'auto' }}>{lead.size_info}{lead.cvr_verified ? ' · CVR ✓' : ''}</div>
+            <div style={{ fontSize: 10, color: 'var(--ink-3)', marginLeft: 'auto' }}>{lead.size_info}{lead.size_info === 'Offentlig instans' ? '' : lead.cvr_verified ? ' · CVR ✓' : ''}</div>
           </div>
         </div>
       )}
