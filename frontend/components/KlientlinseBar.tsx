@@ -81,7 +81,7 @@ export default function KlientlinseBar({ onActivate, onDeactivate }: Props) {
           <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--ink-2)', whiteSpace: 'nowrap' }}>Klientlinse</span>
           <input
             type="text"
-            placeholder="Skriv et firmanavn, fx Green Therma..."
+            placeholder="Skriv et firmanavn, fx Novo Nordisk..."
             value={clientName}
             onChange={e => setClientName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleActivate()}
