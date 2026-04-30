@@ -15,7 +15,8 @@ export type Lead = {
   sector: string
   source: string
   published_at: string
-  score: number
+  url: string;
+  score: number;
   cvr_verified: boolean
   size_info: string
   stakeholders: { name: string; role: string }[]
