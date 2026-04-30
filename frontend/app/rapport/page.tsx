@@ -166,11 +166,11 @@ export default function RapportPage() {
   return (
     <>
       <style>{`
-        @media print {
+        @media print { * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
           .no-print { display: none !important; }
           body { background: white !important; }
         }
-        .rapport-wrap { min-height: 100vh; background: #f2f0eb; padding: 32px 0; }
+        .rapport-wrap { min-height: 100vh; background: #f2f0eb; padding: 32px 0; } @media print { .rapport-wrap { padding: 0 !important; background: #f2f0eb !important; } .no-print { display: none !important; } }
       `}</style>
 
       <div className="rapport-wrap">
@@ -206,7 +206,7 @@ export default function RapportPage() {
                   <img
                     src="/nextstep-logo.png"
                     alt="NEXTSTEP"
-                    style={{ height: 32, mixBlendMode: 'screen', opacity: 0.92 }}
+                    style={{ height: 36, width: 'auto', objectFit: 'contain', mixBlendMode: 'screen', opacity: 0.95 }}
                   />
                   <div style={{ fontSize: 9, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginTop: 6 }}>
                     Public Affairs Intelligence
@@ -255,7 +255,7 @@ export default function RapportPage() {
 
               {/* Tagline */}
               <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.07)', fontSize: 11, color: 'rgba(255,255,255,0.25)', fontStyle: 'italic', letterSpacing: '0.02em' }}>
-                "Kortlægger politiske bevægelser før de bliver nyheder" — NEXTSTEP Public Affairs Intelligence ©
+                Data-driven political intelligence — NEXTSTEP Public Affairs Intelligence ©
               </div>
             </div>
 
