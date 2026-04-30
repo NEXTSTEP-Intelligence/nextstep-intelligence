@@ -1,3 +1,8 @@
+#!/bin/bash
+cd ~/nextstep-intelligence
+echo "v0.1.9 – Radar chart, logo fix og premium branding..."
+
+cat > frontend/app/rapport/page.tsx << 'ENDOFFILE'
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -342,3 +347,8 @@ function CompactLead({ lead, priority }: { lead: Lead; priority?: boolean }) {
     </div>
   )
 }
+ENDOFFILE
+echo "✓ rapport/page.tsx – radar chart + premium branding"
+
+echo ""
+echo "✅ v0.1.9 klar!"
