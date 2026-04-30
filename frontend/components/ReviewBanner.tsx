@@ -17,7 +17,7 @@ export default function ReviewBanner() {
       <div>
         <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>Ugerapport klar til review</div>
         <div style={{ fontSize: 11, color: 'var(--ink-2)', marginTop: 2 }}>
-          Afventer godkendelse fra Claus eller Rasmus · Stjerner nulstilles ved godkendelse
+          Afventer godkendelse fra Claus eller Rasmus
         </div>
       </div>
       <button onClick={() => router.push('/rapport')} style={{

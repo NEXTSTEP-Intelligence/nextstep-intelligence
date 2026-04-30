@@ -280,7 +280,7 @@ export default function RapportPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
                     <div style={{ height: 1, flex: 1, background: '#f0ede8' }} />
                     <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#aaa' }}>
-                      {starred.length > 0 ? 'Øvrige top-leads' : 'Ugens top-leads'}
+                      {starred.length > 0 ? 'Øvrige aktuelle leads' : 'Aktuelle top-leads'}
                     </div>
                     <div style={{ height: 1, flex: 1, background: '#f0ede8' }} />
                   </div>
