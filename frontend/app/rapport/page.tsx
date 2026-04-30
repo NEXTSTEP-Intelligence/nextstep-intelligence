@@ -141,7 +141,7 @@ export default function RapportPage() {
   useEffect(() => {
     const auth = localStorage.getItem('ns_auth')
     if (!auth) { router.push('/'); return }
-    fetch('/api/leads?limit=20&sort=stars')
+    fetch('/api/leads?limit=20&sort=score')
       .then(r => r.json())
       .then(d => { setLeads(d.leads || []); setLoading(false) })
       .catch(() => setLoading(false))
