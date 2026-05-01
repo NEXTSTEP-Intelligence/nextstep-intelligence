@@ -223,8 +223,7 @@ export default function RapportPage() {
                     style={{ height: 36, width: 'auto', objectFit: 'contain', mixBlendMode: 'screen', opacity: 0.95 }}
                   />
                   <div style={{ fontSize: 9, letterSpacing: '0.18em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginTop: 6 }}>
-                    Public Affairs
-Intelligence
+                    <span style={{display:"block"}}>PUBLIC AFFAIRS</span><span style={{display:"block"}}>INTELLIGENCE</span>
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
