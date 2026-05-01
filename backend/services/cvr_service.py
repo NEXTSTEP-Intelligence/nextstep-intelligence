@@ -1,7 +1,6 @@
 import httpx
 import os
 
-CVR_API = "https://api.cvr.dev/api/elastic/vrvirksomhed/_search"
 CVR_TOKEN = os.getenv("CVR_API_TOKEN", "")
 
 PUBLIC_KEYWORDS = [
@@ -26,47 +25,42 @@ async def lookup_cvr(entity: str) -> dict:
                 "cvr_verified": False,
             }
 
-    try:
-        query = {
-            "query": {
-                "bool": {
-                    "must": [
-                        {"match": {"Vrvirksomhed.virksomhedMetadata.nyesteNavn.navn": entity}},
-                        {"term": {"Vrvirksomhed.livsforloeb.periode.gyldigTil": "9999-12-31"}}
-                    ]
-                }
-            },
-            "size": 1,
-            "_source": [
-                "Vrvirksomhed.virksomhedMetadata.nyesteNavn.navn",
-                "Vrvirksomhed.virksomhedMetadata.nyesteAarsbeskaeftigelse.antalAnsatte",
-                "Vrvirksomhed.virksomhedMetadata.nyesteBeliggenhedsadresse.kommune.kommuneNavn",
-            ]
-        }
+    if not CVR_TOKEN:
+        return {"verified": False, "size_info": "", "skip": False, "public": False}
 
-        headers = {"Authorization": f"Bearer {CVR_TOKEN}"} if CVR_TOKEN else {}
+    try:
+        headers = {
+            "Authorization": f"Bearer {CVR_TOKEN}",
+            "Accept": "application/json",
+        }
+        params = {"navn": entity, "land": "dk"}
 
         async with httpx.AsyncClient(timeout=5.0) as client:
-            res = await client.post(CVR_API, json=query, headers=headers)
-            data = res.json()
+            res = await client.get(
+                "https://api.cvr.dev/api/virksomhed",
+                headers=headers,
+                params=params
+            )
 
-        hits = data.get("hits", {}).get("hits", [])
-        if not hits:
+        if res.status_code != 200:
+            print(f"CVR API fejl {res.status_code} for {entity}")
             return {"verified": False, "size_info": "", "skip": False, "public": False}
 
-        source = hits[0].get("_source", {}).get("Vrvirksomhed", {})
-        meta = source.get("virksomhedMetadata", {})
-        ansatte = meta.get("nyesteAarsbeskaeftigelse", {}).get("antalAnsatte", 0) or 0
+        data = res.json()
+        items = data if isinstance(data, list) else data.get("items", [])
 
-        if ansatte < 50:
-            return {"verified": False, "size_info": f"{ansatte} ansatte", "skip": True, "public": False}
+        if not items:
+            return {"verified": False, "size_info": "", "skip": False, "public": False}
+
+        virk = items[0]
+        ansatte = virk.get("antalAnsatte") or virk.get("employees") or 0
 
         return {
-            "verified": True,
-            "size_info": f"{ansatte} ansatte",
+            "verified": ansatte >= 50,
+            "size_info": f"{ansatte} ansatte" if ansatte else "",
             "skip": False,
             "public": False,
-            "cvr_verified": True,
+            "cvr_verified": ansatte >= 50,
         }
 
     except Exception as e:
