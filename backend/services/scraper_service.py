@@ -100,7 +100,13 @@ Svar KUN med JSON i dette format (eller null hvis ikke relevant):
   "module": "public_affairs" eller "velfaerd",
   "opgave_type": "Alliance", "Camp" eller "Entreprenør",
   "sector": "primær sektor",
-  "score": 0-100 (41-60=svagt lead, 61-80=godt lead, 81-100=stærkt lead. Returner kun relevant=true hvis score er over 40),
+  "score": 0-100. Vær meget differentieret og kritisk i din scoring. Brug hele skalaen:
+  90-100: Ekstraordinært lead. Stor kendt virksomhed (500+ ansatte) UDEN intern PA-kapabilitet, akut politisk pres eller lovgivning på vej, klart og konkret handlingsvindue NU. Eksempel: Novo Nordisk rammes af ny EU-regulering og har ikke talt med Christiansborg.
+  75-89: Stærkt lead. Relevant virksomhed eller organisation med identificerbar beslutningstager, konkret politisk situation der kræver handling inden for 1-3 måneder.
+  60-74: Godt lead. Relevant emne og aktør men handlingsvinduet er uklart eller aktøren er svær at identificere præcist.
+  41-59: Svagt lead. Relevant emne men lille aktør, for generisk situation eller ingen klar indgang for NEXTSTEP.
+  0-40: Ikke relevant - gem ikke.
+  VIGTIGT: Undgå at give alle leads samme score. Spred dine vurderinger realistisk.,"
   "entity": "primær virksomhed eller organisation (kun ét navn)",
   "size_info": "antal ansatte eller borgere hvis nævnt",
   "stakeholders": [{{"name": "navn", "role": "rolle i sagen"}}],
