@@ -140,7 +140,7 @@ export default function RapportPage() {
   const [clientName, setClientName] = useState('')
 
   useEffect(() => {
-    const auth = localStorage.getItem('ns_auth')
+    const auth = sessionStorage.getItem('ns_auth')
     if (!auth) { router.push('/'); return }
     const savedClient = localStorage.getItem('klientlinse_client')
     if (savedClient) {

@@ -13,7 +13,7 @@ export default function LoginPage() {
     setError(false)
     const correct = process.env.NEXT_PUBLIC_ACCESS_PASSWORD || 'nextstep2026'
     if (password === correct) {
-      localStorage.setItem('ns_auth', 'true')
+      sessionStorage.setItem('ns_auth', 'true')
       router.push('/dashboard')
     } else {
       setError(true)

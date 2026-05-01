@@ -138,7 +138,7 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    const auth = localStorage.getItem('ns_auth')
+    const auth = sessionStorage.getItem('ns_auth')
     if (!auth) { router.push('/'); return }
     fetchLeads(sort)
     // Gendan klientlinse hvis gemt

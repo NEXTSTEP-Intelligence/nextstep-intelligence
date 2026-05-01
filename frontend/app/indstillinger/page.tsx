@@ -11,7 +11,7 @@ export default function IndstillingerPage() {
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    const auth = localStorage.getItem('ns_auth')
+    const auth = sessionStorage.getItem('ns_auth')
     if (!auth) { router.push('/'); return }
     fetch('/api/settings/emails')
       .then(r => r.json())
