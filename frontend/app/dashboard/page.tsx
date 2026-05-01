@@ -222,16 +222,34 @@ export default function Dashboard() {
 
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', margin: '18px 0 10px', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {['alle', 'Alliance', 'Camp', 'Entreprenør', 'rebizz'].map(f => (
-                <button key={f} onClick={() => setFilter(f)} style={{
-                  fontSize: 12, padding: '5px 13px', borderRadius: 20, cursor: 'pointer',
-                  border: '1px solid rgba(0,0,0,0.1)',
-                  background: filter === f ? 'var(--ink)' : 'transparent',
-                  color: filter === f ? '#fff' : 'var(--ink-2)',
-                }}>
-                  {f === 'alle' ? 'Alle' : f === 'rebizz' ? 'Rebizz' : f}
-                </button>
-              ))}
+              {[
+                { key: 'alle', label: 'Alle' },
+                { key: 'Alliance', label: 'Alliance' },
+                { key: 'Camp', label: 'Camp' },
+                { key: 'Entreprenør', label: 'Entreprenør' },
+                { key: 'rebizz', label: 'Rebizz' },
+              ].map(f => {
+                const count = f.key === 'alle' ? displayLeads.length
+                  : f.key === 'rebizz' ? displayLeads.filter(l => l.gold_matches?.length > 0).length
+                  : displayLeads.filter(l => l.opgave_type === f.key).length
+                const active = filter === f.key
+                return (
+                  <button key={f.key} onClick={() => setFilter(f.key)} style={{
+                    fontSize: 12, padding: '5px 13px', borderRadius: 20, cursor: 'pointer',
+                    border: '1px solid rgba(0,0,0,0.1)',
+                    background: active ? 'var(--ink)' : 'transparent',
+                    color: active ? '#fff' : 'var(--ink-2)',
+                    display: 'flex', alignItems: 'center', gap: 5,
+                  }}>
+                    {f.label}
+                    {active && count > 0 && (
+                      <span style={{ fontSize: 10, background: 'rgba(255,255,255,0.25)', borderRadius: 10, padding: '1px 6px' }}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
             </div>
             <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
               <span style={{ fontSize: 11, color: 'var(--ink-3)', marginRight: 4 }}>Sorter:</span>
