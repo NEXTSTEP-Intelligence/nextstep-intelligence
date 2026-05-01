@@ -43,11 +43,8 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading }: 
   }
 
   const handleDeactivate = () => {
-    setActive(false)
-    setActiveClient('')
-    setClientName('')
     localStorage.removeItem('klientlinse_client')
-    onDeactivate()
+    window.location.reload()
   }
 
   return (
