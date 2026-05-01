@@ -37,7 +37,7 @@ async def lookup_cvr(entity: str) -> dict:
 
         async with httpx.AsyncClient(timeout=5.0) as client:
             res = await client.get(
-                "https://api.cvr.dev/api/virksomhed",
+                "https://api.cvr.dev/api/cvr/virksomhed",
                 headers=headers,
                 params=params
             )
