@@ -106,10 +106,8 @@ export default function Dashboard() {
   const [clientLeads, setClientLeads] = useState<Lead[] | null>(null)
   const [clientName, setClientName] = useState('')
   const [clientLoading, setClientLoading] = useState(false)
-  const [globalLoading, setGlobalLoading] = useState(false)
 
   const fetchLeads = (sortBy: string) => {
-    setGlobalLoading(true)
     fetch(`/api/leads?sort=${sortBy}&days=${activeDays}`).then(r => r.json()).then(d => {
       if (d.leads?.length) {
         setLeads(d.leads)
@@ -191,20 +189,8 @@ export default function Dashboard() {
       `}</style>
       <div className="ns-layout">
         <Sidebar activeModule={activeModule} setActiveModule={setActiveModule} />
-        <main className="ns-main" style={{ position: 'relative' }}>
-          {(globalLoading || clientLoading) && (
-            <div style={{
-              position: 'absolute', inset: 0, zIndex: 50,
-              background: 'rgba(247,245,240,0.75)',
-              backdropFilter: 'blur(4px)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              borderRadius: 8,
-            }}>
-              <div style={{ fontSize: 13, color: 'var(--ink-2)', fontWeight: 500 }}>
-                {clientLoading ? `Analyserer fra ${clientName}s perspektiv...` : 'Henter leads...'}
-              </div>
-            </div>
-          )}
+        <main className="ns-main">
+
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
             <div>
               <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em' }}>Uge {week} · {now.getFullYear()}</h1>
