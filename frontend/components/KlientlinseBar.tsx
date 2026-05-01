@@ -1,9 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Lead } from '@/app/dashboard/page'
-
 type Props = {
-  onActivate: (clientName: string, leads: Lead[]) => void
+  onActivate: (clientName: string) => void
   onDeactivate: () => void
   onLoading?: () => void
 }
@@ -36,7 +34,7 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading }: 
       localStorage.setItem('klientlinse_client', clientName)
       setActive(true)
       setActiveClient(clientName)
-      onActivate(clientName, data.leads || [])
+      onActivate(clientName)
     } catch {
       console.error('Klientlinse fejl')
     } finally {

@@ -126,6 +126,17 @@ export default function Dashboard() {
     }).catch(() => {})
   }
 
+  const applyKlientlinse = (clientName: string) => {
+    if (!clientName) { setClientLeads(null); return }
+    fetch('/api/klientlinse/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ client_name: clientName }),
+    }).then(r => r.json()).then(d => {
+      if (d.leads?.length) setClientLeads([...d.leads])
+    }).catch(() => {})
+  }
+
   useEffect(() => {
     const auth = localStorage.getItem('ns_auth')
     if (!auth) { router.push('/'); return }
@@ -205,8 +216,8 @@ export default function Dashboard() {
 
           <ReviewBanner />
           <KlientlinseBar
-            onActivate={(name, leads) => { setClientName(name); setClientLeads([...leads]); setClientLoading(false) }}
-            onDeactivate={() => { setClientName(''); setClientLeads(null); setClientLoading(false) }}
+            onActivate={(name) => { setClientName(name); applyKlientlinse(name) }}
+            onDeactivate={() => { setClientName(''); setClientLeads(null) }}
             onLoading={() => setClientLoading(true)}
           />
           <StatsRow total={leads.length} pa={pa} vel={vel} rebizz={rebizz} onDaysChange={handleDays} activeDays={activeDays} />
