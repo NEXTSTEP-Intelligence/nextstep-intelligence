@@ -79,6 +79,7 @@ async def run_scraper() -> int:
     return new_leads
 
 async def analyze_article(article: dict) -> dict | None:
+    starred_context = await get_starred_examples()
     prompt = f"""Du er en strategisk analytiker for NEXTSTEP A/S – et dansk strategi- og innovationshus med speciale i Public Affairs og velfærdsforbedringer.
 
 Analyser denne artikel og vurder om den indeholder et lead for NEXTSTEP.
@@ -102,7 +103,7 @@ Svar KUN med JSON i dette format (eller null hvis ikke relevant):
   "module": "public_affairs" eller "velfaerd",
   "opgave_type": "Alliance", "Camp" eller "Entreprenør",
   "sector": "primær sektor OG fokusområde fra denne struktur: SUNDHED (Psykiatri / Ældre / Trivsel), FØDEVARER (Skolemad / Økologi), ENERGI (Geotermi / Fjernvarme / Vand), KLIMA (Fiskeri), BY OG BOLIG (Urban Rigger / Trivsel), BESKÆFTIGELSE, SIKKERHED (Beredskab). Skriv fx: SUNDHED / Psykiatri eller ENERGI / Fjernvarme. Et lead kan have flere sektorer adskilt med komma.",
-  "score": 0-100. Vær meget differentieret og kritisk i din scoring. Brug hele skalaen:
+  {starred_context}"score": 0-100. Vær meget differentieret og kritisk i din scoring. Brug hele skalaen:
   90-100: Ekstraordinært lead. Stor kendt virksomhed (500+ ansatte) UDEN intern PA-kapabilitet, akut politisk pres eller lovgivning på vej, klart og konkret handlingsvindue NU. Eksempel: Novo Nordisk rammes af ny EU-regulering og har ikke talt med Christiansborg.
   75-89: Stærkt lead. Relevant virksomhed eller organisation med identificerbar beslutningstager, konkret politisk situation der kræver handling inden for 1-3 måneder.
   60-74: Godt lead. Relevant emne og aktør men handlingsvinduet er uklart eller aktøren er svær at identificere præcist.
