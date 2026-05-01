@@ -36,6 +36,7 @@ def get_anthropic_client():
 async def run_scraper() -> int:
     new_leads = 0
     all_articles = []
+    seen_urls = set()
 
     for feed_info in RSS_FEEDS:
         try:
@@ -49,8 +50,9 @@ async def run_scraper() -> int:
                     "published": entry.get("published", str(datetime.now())),
                     "published_parsed": entry.get("published_parsed", None),
                 }
-                if article["title"] and not await article_exists(article["url"]):
+                if article["title"] and article["url"] not in seen_urls and not await article_exists(article["url"]):
                     all_articles.append(article)
+                    seen_urls.add(article["url"])
         except Exception as e:
             print(f"Fejl ved hentning af {feed_info['name']}: {e}")
 
