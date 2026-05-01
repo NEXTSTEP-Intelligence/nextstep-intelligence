@@ -54,7 +54,24 @@ async def lookup_cvr(entity: str) -> dict:
             return {"verified": False, "size_info": "", "skip": False, "public": False}
 
         virk = items[0]
-        ansatte = virk.get("antalAnsatte") or virk.get("employees") or 0
+        
+        # Hent antal ansatte fra virksomhedMetadata
+        ansatte = 0
+        metadata = virk.get("virksomhedMetadata", {})
+        if metadata:
+            besk = metadata.get("nyesteAarsbeskaeftigelse", {})
+            if besk:
+                ansatte = besk.get("antalAnsatte", 0) or 0
+        
+        # Fallback: prøv aarsbeskaeftigelse array
+        if not ansatte:
+            besk_list = virk.get("aarsbeskaeftigelse", [])
+            if besk_list:
+                latest = sorted(besk_list, key=lambda x: x.get("aar", 0), reverse=True)
+                if latest:
+                    ansatte = latest[0].get("antalAnsatte", 0) or 0
+
+        print(f"CVR: {entity} har {ansatte} ansatte")
 
         return {
             "verified": ansatte >= 50,
