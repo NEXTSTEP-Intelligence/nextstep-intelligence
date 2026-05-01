@@ -41,11 +41,21 @@ export default function Sidebar({ activeModule, setActiveModule }: Props) {
         </button>
       </div>
       <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--divider)' }}>
-        <div style={{ fontSize: 10, letterSpacing: '0.09em', color: 'var(--ink-3)', textTransform: 'uppercase', padding: '0 14px', marginBottom: 3 }}>Sektorer</div>
-        {['Sundhed', 'Fødevarer', 'Energi & forsyning', 'Klima', 'Kommuner'].map(s => (
-          <button key={s} style={{ width: '100%', textAlign: 'left', padding: '6px 14px', borderRadius: 8, fontSize: 12, border: 'none', background: 'transparent', color: 'var(--ink-3)', cursor: 'pointer' }}>{s}</button>
+        <div style={{ fontSize: 10, letterSpacing: '0.09em', color: 'var(--ink-3)', textTransform: 'uppercase', padding: '0 14px', marginBottom: 3 }}>Sektorer & Fokus</div>
+        {[
+          { label: 'SUNDHED', sub: 'Psykiatri · Ældre · Trivsel' },
+          { label: 'FØDEVARER', sub: 'Skolemad · Økologi' },
+          { label: 'ENERGI', sub: 'Geotermi · Fjernvarme · Vand' },
+          { label: 'KLIMA', sub: 'Fiskeri' },
+          { label: 'BY OG BOLIG', sub: 'Urban Rigger · Trivsel' },
+          { label: 'BESKÆFTIGELSE', sub: '' },
+          { label: 'SIKKERHED', sub: 'Beredskab' },
+        ].map(s => (
+          <button key={s.label} style={{ width: '100%', textAlign: 'left', padding: '6px 14px', borderRadius: 8, fontSize: 12, border: 'none', background: 'transparent', color: 'var(--ink-3)', cursor: 'pointer', lineHeight: 1.4 }}>
+            <div style={{ fontWeight: 500, color: 'var(--ink-2)' }}>{s.label}</div>
+            {s.sub && <div style={{ fontSize: 10, color: 'var(--ink-3)' }}>{s.sub}</div>}
+          </button>
         ))}
-        <button style={{ width: '100%', textAlign: 'left', padding: '6px 14px', borderRadius: 8, fontSize: 12, border: 'none', background: 'transparent', color: 'var(--ink-2)', cursor: 'pointer' }}>+ Tilføj sektor</button>
       </div>
       <div style={{ marginTop: 'auto', paddingTop: 12, borderTop: '1px solid var(--divider)' }}>
         {['Rapport-arkiv', 'Indstillinger'].map(s => (
