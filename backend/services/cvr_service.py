@@ -42,6 +42,7 @@ async def lookup_cvr(entity: str) -> dict:
                 params=params
             )
 
+        print(f"CVR API status {res.status_code} for {entity}, content-type: {res.headers.get('content-type', 'unknown')}, body: {res.text[:200]}")
         if res.status_code != 200:
             print(f"CVR API fejl {res.status_code} for {entity}")
             return {"verified": False, "size_info": "", "skip": False, "public": False}
