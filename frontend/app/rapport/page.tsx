@@ -199,13 +199,13 @@ export default function RapportPage() {
               <button onClick={() => window.print()} style={{ fontSize: 12, padding: '7px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'white', color: '#1a1a1a', cursor: 'pointer' }}>
                 Print / PDF
               </button>
-              {!sent ? (
+              {!clientName && (!sent ? (
                 <button onClick={handleApprove} disabled={sending} style={{ fontSize: 12, fontWeight: 600, padding: '7px 18px', borderRadius: 8, border: 'none', background: '#b8963e', color: 'white', cursor: 'pointer' }}>
                   {sending ? 'Sender...' : 'Godkend og send ↗'}
                 </button>
               ) : (
                 <div style={{ fontSize: 12, fontWeight: 500, padding: '7px 18px', borderRadius: 8, background: '#edf5f1', color: '#2a7d5f' }}>✓ Sendt</div>
-              )}
+              ))}
             </div>
           </div>
 
