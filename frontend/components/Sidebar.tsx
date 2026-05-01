@@ -51,7 +51,7 @@ export default function Sidebar({ activeModule, setActiveModule }: Props) {
           { label: 'SIKKERHED', sub: 'Beredskab' },
           { label: 'SUNDHED', sub: 'Ældre · Psykiatri · Trivsel' },
         ].map(s => (
-          <button key={s.label} onClick={() => setActiveModule(s.label.toLowerCase().replace(/ /g, '_'))} style={{ width: '100%', textAlign: 'left', padding: '6px 14px', borderRadius: 8, fontSize: 12, border: 'none', background: activeModule === s.label.toLowerCase().replace(/ /g, '_') ? 'var(--ink)' : 'transparent', color: activeModule === s.label.toLowerCase().replace(/ /g, '_') ? '#fff' : 'var(--ink-3)', cursor: 'pointer', lineHeight: 1.4 }}>
+          <button key={s.label} onClick={() => { const key = s.label.toLowerCase().replace(/ /g, '_'); setActiveModule(activeModule === key ? 'alle' : key) }} style={{ width: '100%', textAlign: 'left', padding: '6px 14px', borderRadius: 8, fontSize: 12, border: 'none', background: activeModule === s.label.toLowerCase().replace(/ /g, '_') ? 'var(--ink)' : 'transparent', color: activeModule === s.label.toLowerCase().replace(/ /g, '_') ? '#fff' : 'var(--ink-3)', cursor: 'pointer', lineHeight: 1.4 }}>
             <div style={{ fontWeight: 500 }}>{s.label}</div>
             {s.sub && <div style={{ fontSize: 10, opacity: 0.7 }}>{s.sub}</div>}
           </button>
