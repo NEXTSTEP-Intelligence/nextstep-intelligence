@@ -78,6 +78,18 @@ async def run_scraper() -> int:
     print(f"Scraper færdig: {new_leads} nye leads fundet af {len(all_articles)} artikler")
     return new_leads
 
+async def get_starred_examples() -> str:
+    from services.db_service import get_leads
+    try:
+        leads = await get_leads(sort="stars", limit=3)
+        starred = [l for l in leads if (l.get("stars") or 0) > 0]
+        if not starred:
+            return ""
+        examples = "\n".join([f'- "{l["title"]}" (score {l["score"]}, sektor: {l["sector"]})' for l in starred])
+        return f"\n  TEAMET HAR STJERNEMARKERET disse leads som værdifulde:\n{examples}\n  Leads der ligner disse bør scores højere.\n"
+    except:
+        return ""
+
 async def analyze_article(article: dict) -> dict | None:
     starred_context = await get_starred_examples()
     prompt = f"""Du er en strategisk analytiker for NEXTSTEP A/S – et dansk strategi- og innovationshus med speciale i Public Affairs og velfærdsforbedringer.
