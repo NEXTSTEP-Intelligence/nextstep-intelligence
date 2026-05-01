@@ -43,17 +43,17 @@ export default function Sidebar({ activeModule, setActiveModule }: Props) {
       <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--divider)' }}>
         <div style={{ fontSize: 10, letterSpacing: '0.09em', color: 'var(--ink-3)', textTransform: 'uppercase', padding: '0 14px', marginBottom: 3 }}>Sektorer & Fokus</div>
         {[
-          { label: 'SUNDHED', sub: 'Psykiatri · Ældre · Trivsel' },
-          { label: 'FØDEVARER', sub: 'Skolemad · Økologi' },
-          { label: 'ENERGI', sub: 'Geotermi · Fjernvarme · Vand' },
-          { label: 'KLIMA', sub: 'Fiskeri' },
-          { label: 'BY OG BOLIG', sub: 'Urban Rigger · Trivsel' },
           { label: 'BESKÆFTIGELSE', sub: '' },
+          { label: 'BY OG BOLIG', sub: 'Urban Rigger · Trivsel' },
+          { label: 'ENERGI', sub: 'Fjernvarme · Geotermi · Vand' },
+          { label: 'FØDEVARER', sub: 'Økologi · Skolemad' },
+          { label: 'KLIMA', sub: 'Fiskeri' },
           { label: 'SIKKERHED', sub: 'Beredskab' },
+          { label: 'SUNDHED', sub: 'Ældre · Psykiatri · Trivsel' },
         ].map(s => (
-          <button key={s.label} style={{ width: '100%', textAlign: 'left', padding: '6px 14px', borderRadius: 8, fontSize: 12, border: 'none', background: 'transparent', color: 'var(--ink-3)', cursor: 'pointer', lineHeight: 1.4 }}>
-            <div style={{ fontWeight: 500, color: 'var(--ink-2)' }}>{s.label}</div>
-            {s.sub && <div style={{ fontSize: 10, color: 'var(--ink-3)' }}>{s.sub}</div>}
+          <button key={s.label} onClick={() => setActiveModule(s.label.toLowerCase().replace(/ /g, '_'))} style={{ width: '100%', textAlign: 'left', padding: '6px 14px', borderRadius: 8, fontSize: 12, border: 'none', background: activeModule === s.label.toLowerCase().replace(/ /g, '_') ? 'var(--ink)' : 'transparent', color: activeModule === s.label.toLowerCase().replace(/ /g, '_') ? '#fff' : 'var(--ink-3)', cursor: 'pointer', lineHeight: 1.4 }}>
+            <div style={{ fontWeight: 500 }}>{s.label}</div>
+            {s.sub && <div style={{ fontSize: 10, opacity: 0.7 }}>{s.sub}</div>}
           </button>
         ))}
       </div>

@@ -166,6 +166,10 @@ export default function Dashboard() {
   const filtered = displayLeads.filter(l => {
     if (activeModule === 'pa') return l.module === 'public_affairs'
     if (activeModule === 'vel') return l.module === 'velfaerd'
+    if (['beskæftigelse','by_og_bolig','energi','fødevarer','klima','sikkerhed','sundhed'].includes(activeModule)) {
+      const sectorMatch = (l.sector || '').toUpperCase().includes(activeModule.toUpperCase().replace(/_/g, ' '))
+      if (!sectorMatch) return false
+    }
     if (filter === 'rebizz') return l.gold_matches?.length > 0
     if (filter !== 'alle') return l.opgave_type === filter
     return true
