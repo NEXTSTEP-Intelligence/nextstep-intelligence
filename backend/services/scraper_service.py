@@ -101,7 +101,7 @@ Svar KUN med JSON i dette format (eller null hvis ikke relevant):
   "summary": "2-3 sætninger om situationen",
   "module": "public_affairs" eller "velfaerd",
   "opgave_type": "Alliance", "Camp" eller "Entreprenør",
-  "sector": "primær sektor",
+  "sector": "primær sektor OG fokusområde fra denne struktur: SUNDHED (Psykiatri / Ældre / Trivsel), FØDEVARER (Skolemad / Økologi), ENERGI (Geotermi / Fjernvarme / Vand), KLIMA (Fiskeri), BY OG BOLIG (Urban Rigger / Trivsel), BESKÆFTIGELSE, SIKKERHED (Beredskab). Skriv fx: SUNDHED / Psykiatri eller ENERGI / Fjernvarme. Et lead kan have flere sektorer adskilt med komma.",
   "score": 0-100. Vær meget differentieret og kritisk i din scoring. Brug hele skalaen:
   90-100: Ekstraordinært lead. Stor kendt virksomhed (500+ ansatte) UDEN intern PA-kapabilitet, akut politisk pres eller lovgivning på vej, klart og konkret handlingsvindue NU. Eksempel: Novo Nordisk rammes af ny EU-regulering og har ikke talt med Christiansborg.
   75-89: Stærkt lead. Relevant virksomhed eller organisation med identificerbar beslutningstager, konkret politisk situation der kræver handling inden for 1-3 måneder.
