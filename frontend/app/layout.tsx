@@ -4,6 +4,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'NEXTSTEP Intelligence',
   description: 'Scout NS · Intern lead-platform',
+  icons: {
+    icon: '/favicon.png',
+  },
 }
 
 export const viewport: Viewport = {
