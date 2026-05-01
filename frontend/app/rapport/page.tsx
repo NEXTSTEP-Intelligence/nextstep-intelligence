@@ -347,12 +347,12 @@ function CompactLead({ lead, priority }: { lead: Lead; priority?: boolean }) {
         </div>
         <div style={{ fontSize: 11, color: '#999', borderLeft: '2px solid #e8d08a', paddingLeft: 8 }}>
           <span style={{ color: '#b8963e', fontWeight: 600 }}>Vej ind:</span>{' '}
-          <span style={{ color: '#333' }}>{lead.opener?.length > 120 ? lead.opener.slice(0, 120) + '...' : lead.opener}</span>
+          <span style={{ color: '#333' }}>{(lead as any).client_opener ? ((lead as any).client_opener.length > 120 ? (lead as any).client_opener.slice(0, 120) + '...' : (lead as any).client_opener) : (lead.opener?.length > 120 ? lead.opener.slice(0, 120) + '...' : lead.opener)}</span>
         </div>
       </div>
       <div style={{ textAlign: 'right', flexShrink: 0 }}>
         <div style={{ fontSize: 8, color: '#ccc', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Score</div>
-        <div style={{ fontSize: 22, fontWeight: 800, color: '#0d1b2e', letterSpacing: '-0.02em' }}>{lead.score}</div>
+        <div style={{ fontSize: 22, fontWeight: 800, color: (lead as any).client_score ? '#c47a7a' : '#0d1b2e', letterSpacing: '-0.02em' }}>{(lead as any).client_score || lead.score}</div>
       </div>
     </div>
   )
