@@ -205,7 +205,7 @@ export default function Dashboard() {
 
           <ReviewBanner />
           <KlientlinseBar
-            onActivate={(name, leads) => { setClientName(name); setClientLeads(leads); setClientLoading(false) }}
+            onActivate={(name, leads) => { setClientName(name); setClientLeads([...leads]); setClientLoading(false) }}
             onDeactivate={() => { setClientName(''); setClientLeads(null); setClientLoading(false) }}
             onLoading={() => setClientLoading(true)}
           />
