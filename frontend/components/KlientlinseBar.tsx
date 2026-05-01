@@ -61,16 +61,7 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading }: 
     }}>
       {active ? (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-          <style>{`
-            @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.8); } }
-            .ns-pulse { animation: pulse 1.5s ease-in-out infinite; }
-          `}</style>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            {loading ? (
-              <span className="ns-pulse" style={{ width: 10, height: 10, borderRadius: '50%', background: '#c47a7a', display: 'inline-block' }} />
-            ) : (
-              <span style={{ width: 10, height: 10, borderRadius: '50%', background: '#4caf7d', display: 'inline-block' }} />
-            )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Klientlinse aktiv</div>
               <div style={{ fontSize: 14, fontWeight: 600, color: '#e8d08a' }}>{activeClient}</div>
