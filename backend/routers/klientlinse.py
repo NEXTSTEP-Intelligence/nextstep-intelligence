@@ -10,7 +10,7 @@ async def analyze(body: dict):
     if not client_name:
         return {"leads": []}
     
-    leads = await get_leads(limit=20, sort="score")
+    leads = await get_leads(limit=20, sort="score", days=7)
     if not leads:
         return {"leads": []}
     

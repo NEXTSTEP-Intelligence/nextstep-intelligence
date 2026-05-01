@@ -33,9 +33,9 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading }: 
         body: JSON.stringify({ client_name: clientName }),
       })
       const data = await res.json()
+      localStorage.setItem('klientlinse_client', clientName)
       setActive(true)
       setActiveClient(clientName)
-      localStorage.setItem('klientlinse_client', clientName)
       onActivate(clientName, data.leads || [])
     } catch {
       console.error('Klientlinse fejl')
