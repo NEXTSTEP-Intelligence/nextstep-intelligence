@@ -137,14 +137,28 @@ export default function RapportPage() {
   const [loading, setLoading] = useState(true)
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [clientName, setClientName] = useState('')
 
   useEffect(() => {
     const auth = localStorage.getItem('ns_auth')
     if (!auth) { router.push('/'); return }
-    fetch('/api/leads?limit=20&sort=score')
-      .then(r => r.json())
-      .then(d => { setLeads(d.leads || []); setLoading(false) })
-      .catch(() => setLoading(false))
+    const savedClient = localStorage.getItem('klientlinse_client')
+    if (savedClient) {
+      setClientName(savedClient)
+      fetch('/api/klientlinse/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_name: savedClient }),
+      }).then(r => r.json()).then(d => {
+        setLeads(d.leads || [])
+        setLoading(false)
+      }).catch(() => setLoading(false))
+    } else {
+      fetch('/api/leads?limit=20&sort=score')
+        .then(r => r.json())
+        .then(d => { setLeads(d.leads || []); setLoading(false) })
+        .catch(() => setLoading(false))
+    }
   }, [])
 
   const handleApprove = async () => {
@@ -222,6 +236,7 @@ export default function RapportPage() {
                   <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginTop: 3 }}>
                     Scout NS · AI-assisteret nyhedsanalyse
                   </div>
+                  {clientName && <div style={{ fontSize: 11, color: '#c47a7a', marginTop: 6, fontWeight: 600 }}>Klientperspektiv: {clientName}</div>}
                 </div>
               </div>
 
