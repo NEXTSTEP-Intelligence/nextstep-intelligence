@@ -72,6 +72,13 @@ async def run_scraper() -> int:
                 })
                 print(f"Opdateret: {entity} (#{update_count})")
             else:
+                # CVR-tjek
+                cvr = await lookup_cvr(entity)
+                lead["cvr_verified"] = cvr.get("cvr_verified", False)
+                if cvr.get("size_info"):
+                    lead["size_info"] = cvr.get("size_info")
+                if cvr.get("public"):
+                    lead["size_info"] = "Offentlig instans"
                 await save_lead(lead)
                 new_leads += 1
 
