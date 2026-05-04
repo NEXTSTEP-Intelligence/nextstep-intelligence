@@ -133,6 +133,7 @@ export default function Dashboard() {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
       body: JSON.stringify({ client_name: clientName }),
     }).then(r => r.json()).then(d => {
+      console.log('Klientlinse data:', d.leads?.[0]?.client_score)
       if (d.leads?.length) setClientLeads([...d.leads])
     }).catch(() => {})
   }
