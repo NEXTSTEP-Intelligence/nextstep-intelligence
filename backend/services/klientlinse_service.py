@@ -1,9 +1,10 @@
 import anthropic
+from anthropic import AsyncAnthropic
 import json
 import os
 
 def get_client():
-    return anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+    return AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 async def analyze_client_perspective(client_name: str, leads: list) -> list:
     client = get_client()
@@ -33,7 +34,7 @@ Svar KUN med JSON array – ét objekt per lead i samme rækkefølge:
 ]"""
 
     try:
-        response = client.messages.create(
+        response = await client.messages.create(
             model="claude-sonnet-4-6",
             max_tokens=2000,
             messages=[{"role": "user", "content": prompt}]
