@@ -126,16 +126,32 @@ export default function Dashboard() {
     }).catch(() => {})
   }
 
-  const applyKlientlinse = (clientName: string) => {
+  const applyKlientlinse = async (clientName: string) => {
     if (!clientName) { setClientLeads(null); return }
-    fetch(`https://nextstep-intelligence-production.up.railway.app/klientlinse/analyze?t=${Date.now()}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
-      body: JSON.stringify({ client_name: clientName }),
-    }).then(r => r.json()).then(d => {
-      console.log('Klientlinse data:', d.leads?.[0]?.client_score)
-      if (d.leads?.length) setClientLeads([...d.leads])
-    }).catch(() => {})
+    try {
+      const res = await fetch('https://nextstep-intelligence-production.up.railway.app/klientlinse/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client_name: clientName }),
+      })
+      const data = await res.json()
+      const jobId = data.job_id
+      if (!jobId) return
+
+      // Poll indtil done
+      const poll = async () => {
+        const r = await fetch(`https://nextstep-intelligence-production.up.railway.app/klientlinse/status/${jobId}`)
+        const d = await r.json()
+        if (d.status === 'done' && d.leads?.length) {
+          setClientLeads([...d.leads])
+        } else if (d.status === 'running') {
+          setTimeout(poll, 2000)
+        }
+      }
+      setTimeout(poll, 2000)
+    } catch(e) {
+      console.log('Klientlinse fejl:', e)
+    }
   }
 
   useEffect(() => {
