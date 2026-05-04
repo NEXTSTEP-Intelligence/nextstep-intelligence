@@ -15,7 +15,7 @@ async def analyze_client_perspective(client_name: str, leads: list) -> list:
         for l in leads
     ])
     
-    prompt = f"""Du er strategisk rådgiver hos NEXTSTEP A/S. En kollega vil se alle aktuelle leads fra {client_name}'s perspektiv.
+    prompt = f"""Du er strategisk rådgiver hos NEXTSTEP A/S. En kollega vil se alle aktuelle leads fra {client_name}'s perspektiv. Brug din viden om {client_name} – deres branche, forretning og politiske eksponering – til at vurdere hvor relevant hvert lead reelt er for dem.
 
 Analyser hvert lead og vurder:
 1. Hvor relevant er dette lead specifikt for {client_name}?
