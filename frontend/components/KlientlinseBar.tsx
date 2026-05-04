@@ -24,22 +24,11 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading }: 
   const handleActivate = async () => {
     if (!clientName.trim()) return
     setLoading(true)
-    try {
-      const res = await fetch('/api/klientlinse/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ client_name: clientName }),
-      })
-      const data = await res.json()
-      localStorage.setItem('klientlinse_client', clientName)
-      setActive(true)
-      setActiveClient(clientName)
-      onActivate(clientName)
-    } catch {
-      console.error('Klientlinse fejl')
-    } finally {
-      setLoading(false)
-    }
+    localStorage.setItem('klientlinse_client', clientName)
+    setActive(true)
+    setActiveClient(clientName)
+    onActivate(clientName)
+    setLoading(false)
   }
 
   const handleDeactivate = () => {
