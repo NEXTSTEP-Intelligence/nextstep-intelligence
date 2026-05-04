@@ -4,6 +4,7 @@ type Props = {
   onActivate: (clientName: string) => void
   onDeactivate: () => void
   onLoading?: () => void
+  isAnalyzing?: boolean
 }
 
 export default function KlientlinseBar({ onActivate, onDeactivate, onLoading, isAnalyzing }: Props) {

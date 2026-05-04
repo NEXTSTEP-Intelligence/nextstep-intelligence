@@ -145,13 +145,26 @@ export default function RapportPage() {
     const savedClient = localStorage.getItem('klientlinse_client')
     if (savedClient) {
       setClientName(savedClient)
-      fetch('/api/klientlinse/analyze', {
+      fetch('https://nextstep-intelligence-production.up.railway.app/klientlinse/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ client_name: savedClient }),
-      }).then(r => r.json()).then(d => {
-        setLeads(d.leads || [])
-        setLoading(false)
+      }).then(r => r.json()).then(async d => {
+        const jobId = d.job_id
+        if (!jobId) { setLoading(false); return }
+        const poll = async () => {
+          const r = await fetch(`https://nextstep-intelligence-production.up.railway.app/klientlinse/status/${jobId}`)
+          const data = await r.json()
+          if (data.status === 'done' && data.leads?.length) {
+            setLeads(data.leads)
+            setLoading(false)
+          } else if (data.status === 'running') {
+            setTimeout(poll, 2000)
+          } else {
+            setLoading(false)
+          }
+        }
+        setTimeout(poll, 2000)
       }).catch(() => setLoading(false))
     } else {
       fetch('/api/leads?limit=20&sort=score')
