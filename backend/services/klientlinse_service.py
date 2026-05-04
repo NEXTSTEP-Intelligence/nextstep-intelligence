@@ -66,5 +66,5 @@ Svar KUN med JSON array – ét objekt per lead i samme rækkefølge:
         return result
         
     except Exception as e:
-        print(f"Klientlinse fejl: {e}")
+        print(f"Klientlinse fejl v2: {e}")
         return leads
