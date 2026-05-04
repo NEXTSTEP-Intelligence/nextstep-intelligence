@@ -130,7 +130,7 @@ export default function Dashboard() {
     if (!clientName) { setClientLeads(null); return }
     fetch('/api/klientlinse/analyze', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
       body: JSON.stringify({ client_name: clientName }),
     }).then(r => r.json()).then(d => {
       if (d.leads?.length) setClientLeads([...d.leads])
