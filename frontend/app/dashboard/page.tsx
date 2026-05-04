@@ -114,7 +114,7 @@ export default function Dashboard() {
         // Hvis klientlinse er aktiv, re-analyser med nye leads
         const savedClient = localStorage.getItem('klientlinse_client')
         if (savedClient) {
-          fetch(`/api/klientlinse/analyze?t=${Date.now()}`, {
+          fetch(`https://nextstep-intelligence-production.up.railway.app/klientlinse/analyze?t=${Date.now()}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ client_name: savedClient }),
@@ -128,7 +128,7 @@ export default function Dashboard() {
 
   const applyKlientlinse = (clientName: string) => {
     if (!clientName) { setClientLeads(null); return }
-    fetch(`/api/klientlinse/analyze?t=${Date.now()}`, {
+    fetch(`https://nextstep-intelligence-production.up.railway.app/klientlinse/analyze?t=${Date.now()}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
       body: JSON.stringify({ client_name: clientName }),
