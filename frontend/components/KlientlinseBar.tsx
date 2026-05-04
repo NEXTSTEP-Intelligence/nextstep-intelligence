@@ -6,7 +6,7 @@ type Props = {
   onLoading?: () => void
 }
 
-export default function KlientlinseBar({ onActivate, onDeactivate, onLoading }: Props) {
+export default function KlientlinseBar({ onActivate, onDeactivate, onLoading, isAnalyzing }: Props) {
   const [clientName, setClientName] = useState('')
   const [active, setActive] = useState(false)
   const [activeClient, setActiveClient] = useState('')

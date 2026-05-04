@@ -104,6 +104,7 @@ export default function Dashboard() {
   const [activeModule, setActiveModule] = useState('alle')
   const [activeDays, setActiveDays] = useState(7)
   const [clientLeads, setClientLeads] = useState<Lead[] | null>(null)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [clientName, setClientName] = useState('')
   const [clientLoading, setClientLoading] = useState(false)
 
@@ -137,6 +138,7 @@ export default function Dashboard() {
       const data = await res.json()
       const jobId = data.job_id
       if (!jobId) return
+      setIsAnalyzing(true)
 
       // Poll indtil done
       const poll = async () => {
@@ -144,6 +146,7 @@ export default function Dashboard() {
         const d = await r.json()
         if (d.status === 'done' && d.leads?.length) {
           setClientLeads([...d.leads])
+          setIsAnalyzing(false)
         } else if (d.status === 'running') {
           setTimeout(poll, 2000)
         }
@@ -232,6 +235,7 @@ export default function Dashboard() {
           <ReviewBanner />
           <KlientlinseBar
             onActivate={(name) => { setClientName(name); applyKlientlinse(name) }}
+              isAnalyzing={isAnalyzing}
             onDeactivate={() => { setClientName(''); setClientLeads(null) }}
             onLoading={() => setClientLoading(true)}
           />
