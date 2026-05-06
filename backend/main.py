@@ -5,17 +5,23 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from contextlib import asynccontextmanager
 import os
 
-from routers import leads, scraper, reports, settings, klientlinse
+from routers import leads, scraper, reports, settings, klientlinse, mail
 from services.scraper_service import run_scraper
+from services.mail_service import send_approval_request
 
 load_dotenv()
-scheduler = AsyncIOScheduler()
+scheduler = AsyncIOScheduler(timezone="Europe/Copenhagen")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Scraper hver time
     scheduler.add_job(run_scraper, 'cron', minute=0, id='hourly_scrape')
+    # Godkendelses-mail mandag kl. 10:00
+    scheduler.add_job(send_approval_request, 'cron', day_of_week='mon', hour=10, minute=0, id='monday_approval')
+    # Godkendelses-mail torsdag kl. 08:30
+    scheduler.add_job(send_approval_request, 'cron', day_of_week='thu', hour=8, minute=30, id='thursday_approval')
     scheduler.start()
-    print("Scheduler startet – scraper hver time")
+    print("Scheduler startet – scraper hver time, godkendelsesmail man 10:00 og tor 08:30")
     yield
     scheduler.shutdown()
 
@@ -27,6 +33,7 @@ app.include_router(scraper.router)
 app.include_router(reports.router)
 app.include_router(settings.router)
 app.include_router(klientlinse.router)
+app.include_router(mail.router)
 
 @app.get("/health")
 def health():

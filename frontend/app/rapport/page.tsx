@@ -173,9 +173,14 @@ export default function RapportPage() {
   const handleApprove = async () => {
     setSending(true)
     try {
-      await fetch('/api/leads/reset-stars', { method: 'POST' })
-      Object.keys(localStorage).filter(k => k.startsWith('star_')).forEach(k => localStorage.removeItem(k))
-      setSent(true)
+      const res = await fetch('https://nextstep-intelligence-production.up.railway.app/mail/godkend-og-send', { method: 'POST' })
+      const data = await res.json()
+      if (data.status === 'sent') {
+        Object.keys(localStorage).filter(k => k.startsWith('star_')).forEach(k => localStorage.removeItem(k))
+        setSent(true)
+      } else {
+        alert('Noget gik galt – prøv igen')
+      }
     } catch { alert('Fejl – prøv igen') }
     finally { setSending(false) }
   }
