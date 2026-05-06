@@ -46,7 +46,7 @@ export default function Sidebar({ activeModule, setActiveModule }: Props) {
           { label: 'BESKÆFTIGELSE', sub: '' },
           { label: 'BY OG BOLIG', sub: 'Trivsel · Urban Rigger' },
           { label: 'ENERGI', sub: 'Fjernvarme · Geotermi · Vand' },
-          { label: 'FØDEVARER', sub: 'Økologi · Skolemad' },
+          { label: 'FØDEVARER', sub: 'Skolemad · Økologi' },
           { label: 'KLIMA', sub: 'Fiskeri' },
           { label: 'SIKKERHED', sub: 'Arktis · Beredskab' },
           { label: 'SUNDHED', sub: 'Arktis · Psykiatri · Trivsel · Ældre' },
