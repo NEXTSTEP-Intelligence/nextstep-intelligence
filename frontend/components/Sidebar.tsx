@@ -44,12 +44,12 @@ export default function Sidebar({ activeModule, setActiveModule }: Props) {
         <div style={{ fontSize: 10, letterSpacing: '0.09em', color: 'var(--ink-3)', textTransform: 'uppercase', padding: '0 14px', marginBottom: 3 }}>Sektorer & Fokus</div>
         {[
           { label: 'BESKÆFTIGELSE', sub: '' },
-          { label: 'BY OG BOLIG', sub: 'Urban Rigger · Trivsel' },
+          { label: 'BY OG BOLIG', sub: 'Trivsel · Urban Rigger' },
           { label: 'ENERGI', sub: 'Fjernvarme · Geotermi · Vand' },
           { label: 'FØDEVARER', sub: 'Økologi · Skolemad' },
           { label: 'KLIMA', sub: 'Fiskeri' },
-          { label: 'SIKKERHED', sub: 'Beredskab · Arktis' },
-          { label: 'SUNDHED', sub: 'Ældre · Psykiatri · Trivsel · Arktis' },
+          { label: 'SIKKERHED', sub: 'Arktis · Beredskab' },
+          { label: 'SUNDHED', sub: 'Arktis · Psykiatri · Trivsel · Ældre' },
         ].map(s => (
           <button key={s.label} onClick={() => { const key = s.label.toLowerCase().replace(/ /g, '_'); setActiveModule(activeModule === key ? 'alle' : key) }} style={{ width: '100%', textAlign: 'left', padding: '6px 14px', borderRadius: 8, fontSize: 12, border: 'none', background: activeModule === s.label.toLowerCase().replace(/ /g, '_') ? 'var(--ink)' : 'transparent', color: activeModule === s.label.toLowerCase().replace(/ /g, '_') ? '#fff' : 'var(--ink-3)', cursor: 'pointer', lineHeight: 1.4 }}>
             <div style={{ fontWeight: 500 }}>{s.label}</div>

@@ -42,7 +42,7 @@ function RadarChart({ leads }: { leads: Lead[] }) {
 
   const max = Math.max(...Object.values(counts), 1)
   const n = SECTORS.length
-  const cx = 160, cy = 140, r = 100
+  const cx = 185, cy = 140, r = 100
 
   const angleOf = (i: number) => (Math.PI * 2 * i / n) - Math.PI / 2
 
@@ -63,7 +63,7 @@ function RadarChart({ leads }: { leads: Lead[] }) {
   const dataPath = dataPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z'
 
   return (
-    <svg viewBox="0 0 320 280" style={{ width: '100%', maxWidth: 320 }}>
+    <svg viewBox="0 0 370 280" style={{ width: '100%', maxWidth: 370 }}>
       {/* Grid circles */}
       {gridLevels.map((level, li) => (
         <polygon
