@@ -47,19 +47,44 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading, is
       transition: 'all 0.2s',
     }}>
       {active ? (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Klientlinse aktiv</div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#e8d08a' }}>{activeClient}</div>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div>
+                <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Klientlinse aktiv</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#e8d08a' }}>{activeClient}</div>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              {isAnalyzing ? (
+                <span style={{ fontSize: 11, color: '#e8d08a', fontStyle: 'italic', opacity: 0.8 }}>
+                  Analyserer leads med AI...
+                </span>
+              ) : (
+                <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>
+                  Leads er re-rangeret fra {activeClient}s perspektiv
+                </span>
+              )}
+              <button onClick={handleDeactivate} style={{ fontSize: 11, padding: '5px 12px', borderRadius: 6, border: '1px solid rgba(255,255,255,0.15)', background: 'transparent', color: 'rgba(255,255,255,0.5)', cursor: 'pointer' }}>
+                Nulstil
+              </button>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>Leads er re-rangeret fra {activeClient}s perspektiv</span>
-            <button onClick={handleDeactivate} style={{ fontSize: 11, padding: '5px 12px', borderRadius: 6, border: '1px solid rgba(255,255,255,0.15)', background: 'transparent', color: 'rgba(255,255,255,0.5)', cursor: 'pointer' }}>
-              Nulstil
-            </button>
-          </div>
+          {isAnalyzing && (
+            <div style={{ marginTop: 10, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+              <style>{`
+                @keyframes kl-scan {
+                  0% { transform: translateX(-100%); }
+                  100% { transform: translateX(400%); }
+                }
+              `}</style>
+              <div style={{
+                height: '100%', width: '25%',
+                background: 'linear-gradient(90deg, transparent, #e8d08a, transparent)',
+                animation: 'kl-scan 1.4s ease-in-out infinite',
+              }} />
+            </div>
+          )}
         </div>
       ) : (
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
