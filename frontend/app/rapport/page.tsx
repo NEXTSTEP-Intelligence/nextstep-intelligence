@@ -315,14 +315,10 @@ export default function RapportPage() {
               )}
 
               {/* Footer */}
-              <div style={{ marginTop: 36, paddingTop: 20, borderTop: '1px solid #f0ede8', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+              <div style={{ marginTop: 36, paddingTop: 20, borderTop: '1px solid #f0ede8' }}>
                 <div style={{ fontSize: 10, color: '#bbb', letterSpacing: '0.02em' }}>
                   NEXTSTEP Public Affairs Intelligence © · Scout NS · {now.toLocaleDateString('da-DK', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </div>
-                <a href="https://nextstep-intelligence-production-54dc.up.railway.app/dashboard"
-                  style={{ fontSize: 11, fontWeight: 600, color: '#0d1b2e', textDecoration: 'none', padding: '7px 16px', borderRadius: 6, border: '1px solid #e0ddd8' }}>
-                  Se alle leads på platformen →
-                </a>
               </div>
             </div>
           </div>
