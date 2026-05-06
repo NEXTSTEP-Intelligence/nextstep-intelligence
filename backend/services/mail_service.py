@@ -162,13 +162,13 @@ def build_report_email(name: str, day_label: str, week: int, leads: list) -> str
   <tr><td style="background:linear-gradient(135deg,#0d1b2e 0%,#1a2f4a 100%);border-radius:12px 12px 0 0;padding:28px 32px;">
     <table width="100%" cellpadding="0" cellspacing="0"><tr>
       <td>
-        <div style="font-size:9px;letter-spacing:0.16em;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:4px;">NEXTSTEP · POLITISK RADAR · FORTROLIG</div>
+        <div style="font-size:9px;letter-spacing:0.16em;color:rgba(255,255,255,0.6);text-transform:uppercase;margin-bottom:4px;">NEXTSTEP · POLITISK RADAR · FORTROLIG</div>
         <div style="font-size:22px;font-weight:700;color:white;letter-spacing:-0.02em;">{day_label} · Uge {week} · 2026</div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px;">Scout NS · AI-assisteret nyhedsanalyse</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:4px;">Scout NS · AI-assisteret nyhedsanalyse</div>
       </td>
       <td style="text-align:right;vertical-align:middle;">
         <div style="font-size:44px;font-weight:800;color:white;letter-spacing:-0.03em;line-height:1;">{len(leads)}</div>
-        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:2px;">leads identificeret</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.55);margin-top:2px;">leads identificeret</div>
         {"<div style='font-size:10px;color:#b8963e;font-weight:600;margin-top:6px;'>★ " + str(len(starred)) + " teamprioritet" + ("er" if len(starred) != 1 else "") + "</div>" if starred else ""}
       </td>
     </tr></table>

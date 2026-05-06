@@ -30,7 +30,7 @@ export default function ReviewBanner() {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    const sentAt = sessionStorage.getItem('rapport_sent_at')
+    const sentAt = localStorage.getItem('rapport_sent_at')
     if (sentAt) {
       const nextSend = getNextSendTime()
       const sentTime = new Date(sentAt)

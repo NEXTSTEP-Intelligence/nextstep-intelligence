@@ -98,8 +98,7 @@ function formatDate(str: string): string {
 
 export default function Dashboard() {
   const router = useRouter()
-  const [leads, setLeads] = useState<Lead[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [leads, setLeads] = useState<Lead[]>(DEMO_LEADS)
   const [filter, setFilter] = useState('alle')
   const [sort, setSort] = useState('score')
   const [activeModule, setActiveModule] = useState('alle')
@@ -108,12 +107,12 @@ export default function Dashboard() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [clientName, setClientName] = useState('')
   const [clientLoading, setClientLoading] = useState(false)
+  const [totalByDays, setTotalByDays] = useState<Record<number, number>>({})
 
   const fetchLeads = (sortBy: string) => {
     fetch(`/api/leads?sort=${sortBy}&days=${activeDays}`).then(r => r.json()).then(d => {
       if (d.leads?.length) {
         setLeads(d.leads)
-        setIsLoading(false)
         // Hvis klientlinse er aktiv, re-analyser med nye leads
         const savedClient = sessionStorage.getItem('klientlinse_client')
         if (savedClient) {
@@ -125,10 +124,8 @@ export default function Dashboard() {
             if (d.leads?.length) setClientLeads(d.leads)
           }).catch(() => {})
         }
-      } else {
-        setIsLoading(false)
       }
-    }).catch(() => { setIsLoading(false) })
+    }).catch(() => {})
   }
 
   const applyKlientlinse = async (clientName: string) => {
@@ -165,6 +162,13 @@ export default function Dashboard() {
     const auth = sessionStorage.getItem('ns_auth')
     if (!auth) { router.push('/'); return }
     fetchLeads(sort)
+    // Hent totaler for dag-filtre
+    Promise.all([
+      fetch('/api/leads?sort=score&days=7').then(r => r.json()),
+      fetch('/api/leads?sort=score&days=30').then(r => r.json()),
+    ]).then(([d7, d30]) => {
+      setTotalByDays({ 7: d7.leads?.length || 0, 30: d30.leads?.length || 0 })
+    }).catch(() => {})
     // Gendan klientlinse hvis gemt
     const savedClient = sessionStorage.getItem('klientlinse_client')
     if (savedClient) {
@@ -243,7 +247,7 @@ export default function Dashboard() {
             onDeactivate={() => { setClientName(''); setClientLeads(null) }}
             onLoading={() => setClientLoading(true)}
           />
-          <StatsRow total={leads.length} pa={pa} vel={vel} rebizz={rebizz} onDaysChange={handleDays} activeDays={activeDays} />
+          <StatsRow total={leads.length} pa={pa} vel={vel} rebizz={rebizz} onDaysChange={handleDays} activeDays={activeDays} totalByDays={totalByDays} />
 
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', margin: '18px 0 10px', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
@@ -295,9 +299,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {isLoading ? (
-            <div style={{ padding: '60px 0' }} />
-          ) : clientLoading ? (
+          {clientLoading ? (
             <div style={{ textAlign: 'center', padding: 40, color: 'var(--ink-3)', fontSize: 13 }}>⏳ Analyserer leads fra {clientName}s perspektiv...</div>
           ) : leadsWithFormattedDates.map(lead => <LeadCard key={lead.id} lead={lead} hideStars={!!clientLeads} />)}
           {filtered.length === 0 && <div style={{ textAlign: 'center', padding: 60, color: 'var(--ink-3)', fontSize: 14 }}>Ingen leads matcher filteret.</div>}

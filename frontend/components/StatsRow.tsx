@@ -1,9 +1,9 @@
 'use client'
 import { useState } from 'react'
 
-type Props = { total: number; pa: number; vel: number; rebizz: number; onDaysChange: (days: number) => void; activeDays: number }
+type Props = { total: number; pa: number; vel: number; rebizz: number; onDaysChange: (days: number) => void; activeDays: number; totalByDays?: Record<number, number> }
 
-export default function StatsRow({ total, pa, vel, rebizz, onDaysChange, activeDays }: Props) {
+export default function StatsRow({ total, pa, vel, rebizz, onDaysChange, activeDays, totalByDays = {} }: Props) {
   return (
     <div style={{ marginBottom: 4 }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 8 }}>
@@ -30,8 +30,14 @@ export default function StatsRow({ total, pa, vel, rebizz, onDaysChange, activeD
             border: '1px solid rgba(0,0,0,0.1)',
             background: activeDays === o.days ? 'var(--ink)' : 'transparent',
             color: activeDays === o.days ? '#fff' : 'var(--ink-2)',
+            display: 'flex', alignItems: 'center', gap: 5,
           }}>
             {o.label}
+            {totalByDays[o.days] !== undefined && (
+              <span style={{ fontSize: 10, background: activeDays === o.days ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.07)', borderRadius: 10, padding: '1px 6px' }}>
+                {totalByDays[o.days]}
+              </span>
+            )}
           </button>
         ))}
       </div>
