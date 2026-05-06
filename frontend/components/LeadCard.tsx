@@ -36,7 +36,7 @@ export default function LeadCard({ lead }: Props) {
       borderLeftColor: mc.border,
       overflow: 'hidden',
     }}>
-      {isHot && (
+      {isHot && !hideStars && (
         <div style={{ background: 'var(--gold-bg)', padding: '4px 16px', fontSize: 11, color: '#b8963e', fontWeight: 500 }}>
           ★ Populært lead – markeret af {stars} person{stars !== 1 ? 'er' : ''}
         </div>
@@ -58,7 +58,7 @@ export default function LeadCard({ lead }: Props) {
           <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.01em', lineHeight: 1.4 }}>{lead.title}</div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          <StarButton leadId={lead.id} initialStars={stars} onToggle={(s) => setStars(s)} />
+          {!hideStars && <StarButton leadId={lead.id} initialStars={stars} onToggle={(s) => setStars(s)} />}
           <div style={{ textAlign: 'right' }}>
             <div style={{ fontSize: 10, color: 'var(--ink-3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               {lead.client_score ? 'Klient' : 'Score'}

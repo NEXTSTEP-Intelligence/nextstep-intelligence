@@ -293,7 +293,7 @@ export default function Dashboard() {
 
           {clientLoading ? (
             <div style={{ textAlign: 'center', padding: 40, color: 'var(--ink-3)', fontSize: 13 }}>⏳ Analyserer leads fra {clientName}s perspektiv...</div>
-          ) : leadsWithFormattedDates.map(lead => <LeadCard key={lead.id} lead={lead} />)}
+          ) : leadsWithFormattedDates.map(lead => <LeadCard key={lead.id} lead={lead} hideStars={!!clientLeads} />)}
           {filtered.length === 0 && <div style={{ textAlign: 'center', padding: 60, color: 'var(--ink-3)', fontSize: 14 }}>Ingen leads matcher filteret.</div>}
         </main>
       </div>
