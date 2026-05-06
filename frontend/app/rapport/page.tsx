@@ -142,7 +142,7 @@ export default function RapportPage() {
   useEffect(() => {
     const auth = sessionStorage.getItem('ns_auth')
     if (!auth) { router.push('/'); return }
-    const savedClient = localStorage.getItem('klientlinse_client')
+    const savedClient = sessionStorage.getItem('klientlinse_client')
     if (savedClient) {
       setClientName(savedClient)
       fetch('https://nextstep-intelligence-production.up.railway.app/klientlinse/analyze', {

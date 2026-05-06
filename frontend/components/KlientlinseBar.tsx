@@ -14,7 +14,7 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading, is
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    const saved = localStorage.getItem('klientlinse_client')
+    const saved = sessionStorage.getItem('klientlinse_client')
     if (saved) {
       setActiveClient(saved)
       setClientName(saved)
@@ -25,7 +25,7 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading, is
   const handleActivate = async () => {
     if (!clientName.trim()) return
     setLoading(true)
-    localStorage.setItem('klientlinse_client', clientName)
+    sessionStorage.setItem('klientlinse_client', clientName)
     setActive(true)
     setActiveClient(clientName)
     onActivate(clientName)
@@ -33,7 +33,7 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading, is
   }
 
   const handleDeactivate = () => {
-    localStorage.removeItem('klientlinse_client')
+    sessionStorage.removeItem('klientlinse_client')
     window.location.reload()
   }
 

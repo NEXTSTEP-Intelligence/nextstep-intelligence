@@ -113,7 +113,7 @@ export default function Dashboard() {
       if (d.leads?.length) {
         setLeads(d.leads)
         // Hvis klientlinse er aktiv, re-analyser med nye leads
-        const savedClient = localStorage.getItem('klientlinse_client')
+        const savedClient = sessionStorage.getItem('klientlinse_client')
         if (savedClient) {
           fetch(`https://nextstep-intelligence-production.up.railway.app/klientlinse/analyze?t=${Date.now()}`, {
             method: 'POST',
@@ -162,7 +162,7 @@ export default function Dashboard() {
     if (!auth) { router.push('/'); return }
     fetchLeads(sort)
     // Gendan klientlinse hvis gemt
-    const savedClient = localStorage.getItem('klientlinse_client')
+    const savedClient = sessionStorage.getItem('klientlinse_client')
     if (savedClient) {
       setClientName(savedClient)
       applyKlientlinse(savedClient)
