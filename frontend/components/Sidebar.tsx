@@ -48,8 +48,8 @@ export default function Sidebar({ activeModule, setActiveModule }: Props) {
           { label: 'ENERGI', sub: 'Fjernvarme · Geotermi · Vand' },
           { label: 'FØDEVARER', sub: 'Økologi · Skolemad' },
           { label: 'KLIMA', sub: 'Fiskeri' },
-          { label: 'SIKKERHED', sub: 'Beredskab' },
-          { label: 'SUNDHED', sub: 'Ældre · Psykiatri · Trivsel' },
+          { label: 'SIKKERHED', sub: 'Beredskab · Arktis' },
+          { label: 'SUNDHED', sub: 'Ældre · Psykiatri · Trivsel · Arktis' },
         ].map(s => (
           <button key={s.label} onClick={() => { const key = s.label.toLowerCase().replace(/ /g, '_'); setActiveModule(activeModule === key ? 'alle' : key) }} style={{ width: '100%', textAlign: 'left', padding: '6px 14px', borderRadius: 8, fontSize: 12, border: 'none', background: activeModule === s.label.toLowerCase().replace(/ /g, '_') ? 'var(--ink)' : 'transparent', color: activeModule === s.label.toLowerCase().replace(/ /g, '_') ? '#fff' : 'var(--ink-3)', cursor: 'pointer', lineHeight: 1.4 }}>
             <div style={{ fontWeight: 500 }}>{s.label}</div>
