@@ -98,7 +98,8 @@ function formatDate(str: string): string {
 
 export default function Dashboard() {
   const router = useRouter()
-  const [leads, setLeads] = useState<Lead[]>(DEMO_LEADS)
+  const [leads, setLeads] = useState<Lead[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [filter, setFilter] = useState('alle')
   const [sort, setSort] = useState('score')
   const [activeModule, setActiveModule] = useState('alle')
@@ -113,6 +114,7 @@ export default function Dashboard() {
     fetch(`/api/leads?sort=${sortBy}&days=${activeDays}`).then(r => r.json()).then(d => {
       if (d.leads?.length) {
         setLeads(d.leads)
+        setIsLoading(false)
         // Hvis klientlinse er aktiv, re-analyser med nye leads
         const savedClient = sessionStorage.getItem('klientlinse_client')
         if (savedClient) {
@@ -124,8 +126,10 @@ export default function Dashboard() {
             if (d.leads?.length) setClientLeads(d.leads)
           }).catch(() => {})
         }
+      } else {
+        setIsLoading(false)
       }
-    }).catch(() => {})
+    }).catch(() => { setIsLoading(false) })
   }
 
   const applyKlientlinse = async (clientName: string) => {
@@ -299,10 +303,12 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {clientLoading ? (
+          {isLoading ? (
+            <div style={{ padding: '60px 0' }} />
+          ) : clientLoading ? (
             <div style={{ textAlign: 'center', padding: 40, color: 'var(--ink-3)', fontSize: 13 }}>⏳ Analyserer leads fra {clientName}s perspektiv...</div>
           ) : leadsWithFormattedDates.map(lead => <LeadCard key={lead.id} lead={lead} hideStars={!!clientLeads} />)}
-          {filtered.length === 0 && <div style={{ textAlign: 'center', padding: 60, color: 'var(--ink-3)', fontSize: 14 }}>Ingen leads matcher filteret.</div>}
+          {!isLoading && filtered.length === 0 && <div style={{ textAlign: 'center', padding: 60, color: 'var(--ink-3)', fontSize: 14 }}>Ingen leads matcher filteret.</div>}
         </main>
       </div>
     </>

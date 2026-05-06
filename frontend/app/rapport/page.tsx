@@ -177,8 +177,17 @@ export default function RapportPage() {
       const data = await res.json()
       if (data.status === 'sent') {
         Object.keys(localStorage).filter(k => k.startsWith('star_')).forEach(k => localStorage.removeItem(k))
-        sessionStorage.setItem('rapport_sent_at', new Date().toISOString())
-        localStorage.setItem('rapport_sent_at', new Date().toISOString())
+        // Skjul banner indtil næste planlagte udsendelse
+        const now = new Date()
+        const day = now.getDay()
+        const candidates: Date[] = []
+        const mon = new Date(now); mon.setDate(now.getDate() + ((1 - day + 7) % 7)); mon.setHours(10, 0, 0, 0)
+        if (mon > now) candidates.push(new Date(mon))
+        const thu = new Date(now); thu.setDate(now.getDate() + ((4 - day + 7) % 7)); thu.setHours(8, 30, 0, 0)
+        if (thu > now) candidates.push(new Date(thu))
+        if (candidates.length === 0) { mon.setDate(mon.getDate() + 7); candidates.push(mon) }
+        const next = candidates.sort((a, b) => a.getTime() - b.getTime())[0]
+        localStorage.setItem('rapport_hide_until', next.toISOString())
         setSent(true)
       } else {
         alert('Noget gik galt – prøv igen')
