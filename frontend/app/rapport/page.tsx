@@ -193,8 +193,50 @@ export default function RapportPage() {
     ? leads.slice(0, 6)
     : leads.filter(l => (l.stars || 0) === 0).slice(0, starred.length > 0 ? 4 : 6)
 
+  const [showPin, setShowPin] = useState(false)
+  const [pin, setPin] = useState('')
+  const [pinError, setPinError] = useState(false)
+
+  const handlePinSubmit = () => {
+    if (pin === '3250') {
+      setShowPin(false)
+      setPin('')
+      setPinError(false)
+      handleApprove()
+    } else {
+      setPinError(true)
+      setPin('')
+    }
+  }
+
   return (
     <>
+      {showPin && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: 'white', borderRadius: 12, padding: '28px 32px', width: 280, boxShadow: '0 8px 40px rgba(0,0,0,0.2)' }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: '#0d1b2e', marginBottom: 6 }}>Godkend rapport</div>
+            <div style={{ fontSize: 12, color: '#888', marginBottom: 16 }}>Indtast PIN-kode for at sende rapporten til teamet</div>
+            <input
+              type="password"
+              value={pin}
+              onChange={e => { setPin(e.target.value); setPinError(false) }}
+              onKeyDown={e => e.key === 'Enter' && handlePinSubmit()}
+              placeholder="PIN-kode"
+              autoFocus
+              style={{ width: '100%', padding: '9px 12px', fontSize: 16, borderRadius: 8, border: pinError ? '1.5px solid #e74c3c' : '1.5px solid #e0ddd8', outline: 'none', marginBottom: pinError ? 6 : 16, boxSizing: 'border-box', letterSpacing: '0.3em' }}
+            />
+            {pinError && <div style={{ fontSize: 11, color: '#e74c3c', marginBottom: 12 }}>Forkert PIN-kode</div>}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button onClick={() => { setShowPin(false); setPin(''); setPinError(false) }} style={{ flex: 1, padding: '8px', borderRadius: 8, border: '1px solid #e0ddd8', background: 'white', color: '#666', fontSize: 12, cursor: 'pointer' }}>
+                Annuller
+              </button>
+              <button onClick={handlePinSubmit} style={{ flex: 1, padding: '8px', borderRadius: 8, border: 'none', background: '#b8963e', color: 'white', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                Send ↗
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <style>{`
         @media print { * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
           .no-print { display: none !important; }
@@ -216,7 +258,7 @@ export default function RapportPage() {
                 Print / PDF
               </button>
               {!clientName && (!sent ? (
-                <button onClick={handleApprove} disabled={sending} style={{ fontSize: 12, fontWeight: 600, padding: '7px 18px', borderRadius: 8, border: 'none', background: '#b8963e', color: 'white', cursor: 'pointer' }}>
+                <button onClick={() => setShowPin(true)} disabled={sending} style={{ fontSize: 12, fontWeight: 600, padding: '7px 18px', borderRadius: 8, border: 'none', background: '#b8963e', color: 'white', cursor: 'pointer' }}>
                   {sending ? 'Sender...' : 'Godkend og send ↗'}
                 </button>
               ) : (
