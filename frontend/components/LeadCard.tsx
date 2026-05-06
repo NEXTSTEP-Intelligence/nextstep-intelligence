@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Lead } from '@/app/dashboard/page'
 import StarButton from './StarButton'
 
-type Props = { lead: Lead }
+type Props = { lead: Lead, hideStars?: boolean }
 
 const MC = {
   public_affairs: { border: 'var(--pa)', chip: '#1a1a1a', chipText: '#f5f0e8', score: 'var(--pa)', sbg: '#f5f3ef', slabel: '#666', dot: '#1a1a1a' },
@@ -15,7 +15,7 @@ const OC: Record<string, { bg: string; color: string }> = {
   'Entreprenør': { bg: '#fdeee8', color: '#a0430a' },
 }
 
-export default function LeadCard({ lead }: Props) {
+export default function LeadCard({ lead, hideStars }: Props) {
   const [expanded, setExpanded] = useState(false)
   const [stars, setStars] = useState(lead.stars || 0)
   const mc = MC[lead.module]
