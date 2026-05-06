@@ -22,10 +22,9 @@ const SECTORS = [
   { key: 'fødevarer', label: 'Fødevarer', color: '#5c8a2a' },
   { key: 'energi', label: 'Energi', color: '#e9c46a' },
   { key: 'klima', label: 'Klima', color: '#2a6b7d' },
-  { key: 'kommuner', label: 'Kommuner', color: '#9b5de5' },
+  { key: 'by og bolig', label: 'By og Bolig', color: '#9b5de5' },
+  { key: 'beskæftigelse', label: 'Beskæftigelse', color: '#c77dff' },
   { key: 'sikkerhed', label: 'Sikkerhed', color: '#e76f51' },
-  { key: 'eu', label: 'EU/Reg.', color: '#4895ef' },
-  { key: 'økonomi', label: 'Økonomi', color: '#c77dff' },
 ]
 
 function RadarChart({ leads }: { leads: Lead[] }) {
@@ -34,14 +33,11 @@ function RadarChart({ leads }: { leads: Lead[] }) {
 
   leads.forEach(lead => {
     const sector = (lead.sector || '').toLowerCase()
-    let matched = false
     SECTORS.forEach(s => {
       if (sector.includes(s.key) || sector.includes(s.label.toLowerCase())) {
         counts[s.key]++
-        matched = true
       }
     })
-    if (!matched) counts['økonomi']++
   })
 
   const max = Math.max(...Object.values(counts), 1)
