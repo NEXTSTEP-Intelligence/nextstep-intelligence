@@ -177,6 +177,7 @@ export default function RapportPage() {
       const data = await res.json()
       if (data.status === 'sent') {
         Object.keys(localStorage).filter(k => k.startsWith('star_')).forEach(k => localStorage.removeItem(k))
+        sessionStorage.setItem('rapport_sent_at', new Date().toISOString())
         setSent(true)
       } else {
         alert('Noget gik galt – prøv igen')
