@@ -188,7 +188,9 @@ export default function RapportPage() {
   const week = getWeekNumber(now)
   const dayLabel = getDayLabel(now)
   const starred = leads.filter(l => (l.stars || 0) > 0).sort((a, b) => (b.stars || 0) - (a.stars || 0))
-  const topLeads = leads.filter(l => (l.stars || 0) === 0).slice(0, starred.length > 0 ? 4 : 6)
+  const topLeads = clientName
+    ? leads.slice(0, 6)
+    : leads.filter(l => (l.stars || 0) === 0).slice(0, starred.length > 0 ? 4 : 6)
 
   return (
     <>
@@ -272,7 +274,7 @@ export default function RapportPage() {
                     <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
                       <span style={{ color: '#2a9d8f', fontWeight: 600 }}>{leads.filter(l => l.module === 'velfaerd').length}</span> Velfærd
                     </div>
-                    {starred.length > 0 && (
+                    {!clientName && starred.length > 0 && (
                       <div style={{ fontSize: 11, color: '#b8963e', fontWeight: 600, marginTop: 4 }}>
                         ★ {starred.length} teamprioritet{starred.length !== 1 ? 'er' : ''}
                       </div>
@@ -293,7 +295,7 @@ export default function RapportPage() {
                 <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>Henter leads...</div>
               ) : (
                 <>
-                  {starred.length > 0 && (
+                  {!clientName && starred.length > 0 && (
                     <>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
                         <div style={{ height: 1, flex: 1, background: '#f0ede8' }} />
@@ -308,11 +310,11 @@ export default function RapportPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
                     <div style={{ height: 1, flex: 1, background: '#f0ede8' }} />
                     <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#aaa' }}>
-                      {starred.length > 0 ? 'Øvrige aktuelle leads' : 'Aktuelle top-leads'}
+                      {clientName ? 'Klientprioriterede leads' : starred.length > 0 ? 'Øvrige aktuelle leads' : 'Aktuelle top-leads'}
                     </div>
                     <div style={{ height: 1, flex: 1, background: '#f0ede8' }} />
                   </div>
-                  {topLeads.map(lead => <CompactLead key={lead.id} lead={lead} />)}
+                  {topLeads.map(lead => <CompactLead key={lead.id} lead={lead} clientName={clientName} />)}
                 </>
               )}
 
@@ -334,7 +336,7 @@ export default function RapportPage() {
   )
 }
 
-function CompactLead({ lead, priority }: { lead: Lead; priority?: boolean }) {
+function CompactLead({ lead, priority, clientName }: { lead: Lead; priority?: boolean; clientName?: string }) {
   const mc = MC[lead.module] || MC.public_affairs
   const OC: Record<string, string> = {
     Alliance: '#b8963e', Camp: '#5c3d99', 'Entreprenør': '#a0430a',
@@ -352,7 +354,7 @@ function CompactLead({ lead, priority }: { lead: Lead; priority?: boolean }) {
           <span style={{ fontSize: 9, color: '#bbb' }}>{lead.sector}</span>
           <span style={{ fontSize: 9, color: '#ccc' }}>·</span>
           <span style={{ fontSize: 9, color: '#bbb' }}>{lead.source} · {lead.published_at}</span>
-          {priority && (lead.stars || 0) > 0 && <span style={{ fontSize: 9, color: '#b8963e', fontWeight: 700 }}>★ {lead.stars}</span>}
+          {priority && !clientName && (lead.stars || 0) > 0 && <span style={{ fontSize: 9, color: '#b8963e', fontWeight: 700 }}>★ {lead.stars}</span>}
         </div>
         <div style={{ fontSize: 13, fontWeight: 700, color: '#0d1b2e', marginBottom: 5, letterSpacing: '-0.01em', lineHeight: 1.35 }}>{lead.title}</div>
         <div style={{ fontSize: 12, color: '#666', lineHeight: 1.6, marginBottom: 6 }}>
