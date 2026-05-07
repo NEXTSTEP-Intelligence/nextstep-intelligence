@@ -137,7 +137,7 @@ export default function RapportPage() {
 
   useEffect(() => {
     const auth = sessionStorage.getItem('ns_auth')
-    if (!auth) { router.push('/'); return }
+    if (!auth) { router.push('/?redirect=/rapport'); return }
     const savedClient = sessionStorage.getItem('klientlinse_client')
     if (savedClient) {
       setClientName(savedClient)

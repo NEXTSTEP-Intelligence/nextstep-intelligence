@@ -1,12 +1,13 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
   const handleLogin = async () => {
     setLoading(true)
@@ -14,7 +15,8 @@ export default function LoginPage() {
     const correct = process.env.NEXT_PUBLIC_ACCESS_PASSWORD || 'nextstep2026'
     if (password === correct) {
       sessionStorage.setItem('ns_auth', 'true')
-      router.push('/dashboard')
+      const redirect = searchParams.get('redirect') || '/dashboard'
+      router.push(redirect)
     } else {
       setError(true)
       setLoading(false)
