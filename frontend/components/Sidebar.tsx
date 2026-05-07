@@ -36,9 +36,6 @@ export default function Sidebar({ activeModule, setActiveModule }: Props) {
         <div style={{ fontSize: 10, letterSpacing: '0.09em', color: 'var(--ink-3)', textTransform: 'uppercase', padding: '0 14px', marginBottom: 3 }}>Moduler</div>
         {btn('Public Affairs', 'pa', 'var(--pa)')}
         {btn('Velfærd', 'vel', 'var(--vel)')}
-        <button style={{ width: '100%', textAlign: 'left', padding: '7px 14px', borderRadius: 8, fontSize: 12, border: 'none', background: 'transparent', color: 'var(--ink-3)', fontStyle: 'italic', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 9 }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', border: '1px dashed #ccc', flexShrink: 0, display: 'inline-block' }} />+ Nyt modul
-        </button>
       </div>
       <div style={{ marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--divider)' }}>
         <div style={{ fontSize: 10, letterSpacing: '0.09em', color: 'var(--ink-3)', textTransform: 'uppercase', padding: '0 14px', marginBottom: 3 }}>Sektorer & Fokus</div>
