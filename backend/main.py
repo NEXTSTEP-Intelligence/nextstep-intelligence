@@ -8,6 +8,7 @@ import os
 from routers import leads, scraper, reports, settings, klientlinse, mail
 from services.scraper_service import run_scraper
 from services.mail_service import send_approval_request
+from services.db_service import cleanup_old_leads
 
 load_dotenv()
 scheduler = AsyncIOScheduler(timezone="Europe/Copenhagen")
@@ -20,8 +21,10 @@ async def lifespan(app: FastAPI):
     scheduler.add_job(send_approval_request, 'cron', day_of_week='mon', hour=10, minute=0, id='monday_approval')
     # Godkendelses-mail torsdag kl. 08:30
     scheduler.add_job(send_approval_request, 'cron', day_of_week='thu', hour=8, minute=30, id='thursday_approval')
+    # Oprydning af leads ældre end 90 dage kl. 03:00 hver nat
+    scheduler.add_job(cleanup_old_leads, 'cron', hour=3, minute=0, id='daily_cleanup')
     scheduler.start()
-    print("Scheduler startet – scraper hver time, godkendelsesmail man 10:00 og tor 08:30")
+    print("Scheduler startet – scraper hver time, godkendelsesmail man 10:00 og tor 08:30, oprydning kl. 03:00")
     yield
     scheduler.shutdown()
 

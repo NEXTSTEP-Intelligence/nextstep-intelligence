@@ -111,7 +111,7 @@ export default function Dashboard() {
   const [totalByDays, setTotalByDays] = useState<Record<number, number>>({})
 
   const fetchLeads = (sortBy: string) => {
-    fetch(`/api/leads?sort=${sortBy}&days=${activeDays}`).then(r => r.json()).then(d => {
+    fetch(`/api/leads?sort=${sortBy}&days=${activeDays}&limit=50`).then(r => r.json()).then(d => {
       if (d.leads?.length) {
         setLeads(d.leads)
         setIsLoading(false)
@@ -168,8 +168,8 @@ export default function Dashboard() {
     fetchLeads(sort)
     // Hent totaler for dag-filtre
     Promise.all([
-      fetch('/api/leads?sort=score&days=7').then(r => r.json()),
-      fetch('/api/leads?sort=score&days=30').then(r => r.json()),
+      fetch('/api/leads?sort=score&days=7&limit=50').then(r => r.json()),
+      fetch('/api/leads?sort=score&days=30&limit=50').then(r => r.json()),
     ]).then(([d7, d30]) => {
       setTotalByDays({ 7: d7.leads?.length || 0, 30: d30.leads?.length || 0 })
     }).catch(() => {})
@@ -183,7 +183,7 @@ export default function Dashboard() {
 
   const handleDays = (d: number) => {
     setActiveDays(d)
-    fetch(`/api/leads?sort=${sort}&days=${d}`).then(r => r.json()).then(data => {
+    fetch(`/api/leads?sort=${sort}&days=${d}&limit=50`).then(r => r.json()).then(data => {
       if (data.leads?.length) setLeads(data.leads)
       else setLeads([])
     }).catch(() => {})
@@ -238,6 +238,12 @@ export default function Dashboard() {
               <p style={{ fontSize: 12, color: 'var(--ink-3)', marginTop: 4 }}>
                 Opdateret kl. {String(now.getHours()).padStart(2,'0')}:{String(now.getMinutes()).padStart(2,'0')} · {`${getNextRapport()}`}
               </p>
+              {!isLoading && leads.length > 0 && (
+                <p style={{ fontSize: 11, color: 'var(--ink-3)', marginTop: 3 }}>
+                  <span style={{ fontWeight: 600, color: leads.length >= 50 ? 'var(--gold)' : 'var(--ink-2)' }}>{leads.length}</span>
+                  <span style={{ color: 'var(--ink-3)' }}>/50 leads</span>
+                </p>
+              )}
             </div>
             <button onClick={() => router.push('/rapport')} style={{ fontSize: 12, fontWeight: 500, padding: '8px 18px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(0,0,0,0.12)', background: 'var(--surface)', color: 'var(--ink)', whiteSpace: 'nowrap', cursor: 'pointer' }}>
               Generer rapport ↗

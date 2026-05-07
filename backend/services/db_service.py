@@ -12,14 +12,14 @@ def get_client() -> Client:
             _client = create_client(url, key)
     return _client
 
-async def get_leads(module: str = None, limit: int = 20, sort: str = "score", days: int = None) -> list:
+async def get_leads(module: str = None, limit: int = 50, sort: str = "score", days: int = None) -> list:
     client = get_client()
     if not client:
         return []
     try:
         from datetime import datetime, timedelta, timezone
         sort_column = "created_at" if sort == "date" else "stars" if sort == "stars" else "score"
-        query = client.table("leads").select("*").order(sort_column, desc=True).limit(limit)
+        query = client.table("leads").select("*").gte("score", 38).order(sort_column, desc=True).limit(limit)
         if module:
             query = query.eq("module", module)
         if days:
@@ -126,6 +126,52 @@ async def save_report_emails(emails: list) -> bool:
     except Exception as e:
         print(f"Save emails fejl: {e}")
         return False
+
+async def cleanup_old_leads() -> int:
+    client = get_client()
+    if not client:
+        return 0
+    try:
+        from datetime import datetime, timedelta, timezone
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=90)).isoformat()
+        result = client.table("leads").delete().lt("created_at", cutoff).eq("stars", 0).execute()
+        count = len(result.data) if result.data else 0
+        print(f"Oprydning: {count} leads ældre end 90 dage slettet")
+        return count
+    except Exception as e:
+        print(f"Oprydning fejl: {e}")
+        return 0
+
+async def find_similar_leads(entity: str, sector: str, days: int = 365) -> list:
+    """Find tidligere leads med samme entity eller sektor – til historisk kontekst."""
+    client = get_client()
+    if not client:
+        return []
+    try:
+        from datetime import datetime, timedelta, timezone
+        since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+        results = []
+        if entity:
+            r = client.table("leads").select("title, entity, sector, score, created_at") \
+                .ilike("entity", f"%{entity}%") \
+                .gte("created_at", since) \
+                .order("created_at", desc=True) \
+                .limit(3).execute()
+            results.extend(r.data or [])
+        if len(results) < 2 and sector:
+            primary_sector = sector.split("/")[0].strip()
+            r = client.table("leads").select("title, entity, sector, score, created_at") \
+                .ilike("sector", f"%{primary_sector}%") \
+                .gte("created_at", since) \
+                .order("score", desc=True) \
+                .limit(3).execute()
+            for item in (r.data or []):
+                if not any(x.get("title") == item.get("title") for x in results):
+                    results.append(item)
+        return results[:4]
+    except Exception as e:
+        print(f"Find similar leads fejl: {e}")
+        return []
 
 async def find_existing_lead(entity: str, days: int = 30) -> dict | None:
     client = get_client()

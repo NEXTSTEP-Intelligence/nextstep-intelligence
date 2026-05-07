@@ -3,11 +3,12 @@ import anthropic
 import json
 import os
 from datetime import datetime
-from services.db_service import save_lead, article_exists, find_existing_lead, update_lead
+from services.db_service import save_lead, article_exists, find_existing_lead, update_lead, find_similar_leads
 from services.cvr_service import lookup_cvr
 
-# Danske nyhedskilder - RSS feeds (Fase 1)
+# Danske nyhedskilder - RSS feeds
 RSS_FEEDS = [
+    # ── Nationale medier ──────────────────────────────────────────
     {"name": "Altinget", "url": "https://www.altinget.dk/rss/altinget.rss"},
     {"name": "Altinget Sundhed", "url": "https://www.altinget.dk/rss/sundhed.rss"},
     {"name": "Altinget Miljoe", "url": "https://www.altinget.dk/rss/miljoe.rss"},
@@ -16,6 +17,7 @@ RSS_FEEDS = [
     {"name": "Altinget Kommune", "url": "https://www.altinget.dk/rss/kommune.rss"},
     {"name": "Altinget Klima", "url": "https://www.altinget.dk/rss/klima.rss"},
     {"name": "Altinget Arbejdsmarked", "url": "https://www.altinget.dk/rss/arbejdsmarked.rss"},
+    {"name": "Altinget Forsvaret", "url": "https://www.altinget.dk/rss/forsvaret.rss"},
     {"name": "DR Nyheder", "url": "https://www.dr.dk/nyheder/service/feeds/allenyheder"},
     {"name": "DR Politik", "url": "https://www.dr.dk/nyheder/service/feeds/politik"},
     {"name": "DR Penge", "url": "https://www.dr.dk/nyheder/service/feeds/penge"},
@@ -25,7 +27,58 @@ RSS_FEEDS = [
     {"name": "Information", "url": "https://www.information.dk/rss"},
     {"name": "Momentum", "url": "https://www.momentum.dk/feed/"},
     {"name": "Ingenioren", "url": "https://ing.dk/rss"},
-    {"name": "Altinget Forsvaret", "url": "https://www.altinget.dk/rss/forsvaret.rss"},
+    # ── Regionale dagblade ────────────────────────────────────────
+    {"name": "Nordjyske", "url": "https://nordjyske.dk/rss/nyheder"},
+    {"name": "JydskeVestkysten", "url": "https://www.jv.dk/rss/nyheder"},
+    {"name": "Herning Folkeblad", "url": "https://www.herningfolkeblad.dk/rss"},
+    {"name": "Viborg Stifts Folkeblad", "url": "https://www.viborg-folkeblad.dk/rss"},
+    {"name": "Skive Folkeblad", "url": "https://www.skivefolkeblad.dk/rss"},
+    {"name": "Horsens Folkeblad", "url": "https://hsfo.dk/rss"},
+    {"name": "Aarhus Stiftstidende", "url": "https://www.stiften.dk/rss"},
+    {"name": "Midtjyllands Avis", "url": "https://www.midtjyllandsavis.dk/rss"},
+    {"name": "Vejle Amts Folkeblad", "url": "https://www.vejleonline.dk/rss"},
+    {"name": "Fyens Stiftstidende", "url": "https://www.fyensstiftstidende.dk/rss"},
+    {"name": "Fyns Amts Avis", "url": "https://www.fynsamtsavis.dk/rss"},
+    {"name": "Bornholms Tidende", "url": "https://www.bornholmstidende.dk/rss"},
+    {"name": "Sjaellands Nyheder", "url": "https://sn.dk/rss/nyheder"},
+    {"name": "Lolland-Falsters Folketidende", "url": "https://www.folketidende.dk/rss"},
+    {"name": "Dagbladet Holstebro-Struer", "url": "https://www.dagbladet-holstebro-struer.dk/rss"},
+    {"name": "Ringkjoebing Amts Dagblad", "url": "https://www.ringkoebing-amts-dagblad.dk/rss"},
+    {"name": "Thisted Dagblad", "url": "https://www.thisted-dagblad.dk/rss"},
+    {"name": "Morsoe Folkeblad", "url": "https://www.morsoefolkeblad.dk/rss"},
+    {"name": "Vesthimmerlands Avis", "url": "https://www.vesthimmerlandsavis.dk/rss"},
+    {"name": "Frederiksborg Amts Avis", "url": "https://www.frederiksborgamtsavis.dk/rss"},
+    {"name": "Kalundborg Folkeblad", "url": "https://www.kalundborg-folkeblad.dk/rss"},
+    {"name": "Holbæk Amts Venstreblad", "url": "https://www.venstrebladet.dk/rss"},
+    # ── TV-stationer ──────────────────────────────────────────────
+    {"name": "TV2 Ostjylland", "url": "https://www.tv2ostjylland.dk/rss"},
+    {"name": "TV Midtvest", "url": "https://www.tvmidtvest.dk/rss"},
+    {"name": "TV2 Nord", "url": "https://www.tv2nord.dk/rss"},
+    {"name": "TV2 Fyn", "url": "https://www.tv2fyn.dk/rss"},
+    {"name": "TV2 Lorry", "url": "https://www.tv2lorry.dk/rss"},
+    {"name": "TV Syd", "url": "https://www.tvsyd.dk/rss"},
+    # ── Lokale ugeaviser ──────────────────────────────────────────
+    {"name": "Herning Bladet", "url": "https://www.herningbladet.dk/rss"},
+    {"name": "Holstebro Posten", "url": "https://www.holstebroposten.dk/rss"},
+    {"name": "Ikast Avis", "url": "https://www.ikastavis.dk/rss"},
+    {"name": "Ugeavisen Esbjerg", "url": "https://esbjerg.hveruge.dk/rss"},
+    {"name": "Ugeavisen Varde", "url": "https://varde.hveruge.dk/rss"},
+    {"name": "Randers Amts Avis", "url": "https://www.randersamtsavis.dk/rss"},
+    {"name": "Djurslandsposten", "url": "https://www.djurslandsposten.dk/rss"},
+    {"name": "Hedensted Avis", "url": "https://www.hedensted-avis.dk/rss"},
+    {"name": "Odder Avis", "url": "https://www.internetavisen.dk/odder/rss"},
+    {"name": "Uge-Bladet Skanderborg", "url": "https://www.uge-bladet.dk/rss"},
+    {"name": "Ugeavisen Fredericia", "url": "https://www.ugeavisenfredericia.dk/rss"},
+    {"name": "Kolding Ugeavis", "url": "https://www.koldingugeavis.dk/rss"},
+    {"name": "Sønderborg Ugeavis", "url": "https://www.soenderborgugeavis.dk/rss"},
+    {"name": "Aabenraa Ugeavis", "url": "https://aabenraa.bynet.dk/rss"},
+    {"name": "Haderslev Ugeavis", "url": "https://www.haderslevugeavis.dk/rss"},
+    {"name": "Lokalavisen Lemvig", "url": "https://www.lokalavisenlemvig.dk/rss"},
+    {"name": "Lokalavisen Assens", "url": "https://www.lokalavisenassens.dk/rss"},
+    {"name": "Lokalavisen Frederikshavn", "url": "https://lokalavisenfrederikshavn.dk/rss"},
+    {"name": "Naestved Bladet", "url": "https://www.naestved-bladet.dk/rss"},
+    {"name": "Roskilde Avis", "url": "https://www.roskildemediecenter.dk/rss"},
+    {"name": "Frederiksvaerk Ugeblad", "url": "https://www.frederiksvaerkugeblad.dk/rss"},
 ]
 
 SECTORS = ["sundhed", "fødevarer", "energi", "forsyning", "klima", "kommuner", "velfærd", "regulering", "miljø", "sociale forhold"]
@@ -99,6 +152,24 @@ async def get_starred_examples() -> str:
 
 async def analyze_article(article: dict) -> dict | None:
     starred_context = await get_starred_examples()
+
+    # Hent historisk kontekst – tidligere leads om samme emne
+    # Vi bruger entity fra titlen som foreløbig søgning
+    title_words = article.get('title', '')
+    similar = await find_similar_leads(entity=title_words[:50], sector="", days=365)
+    historical_context = ""
+    if similar:
+        historical_context = "\n\nHISTORISK KONTEKST – tidligere leads på samme emne/aktør:\n"
+        for s in similar:
+            from datetime import datetime, timezone
+            try:
+                dato = datetime.fromisoformat(s['created_at'].replace('Z', '+00:00'))
+                dage = (datetime.now(timezone.utc) - dato).days
+                historical_context += f"- \"{s['title']}\" ({dage} dage siden, score {s['score']}, {s['sector']})\n"
+            except:
+                historical_context += f"- \"{s['title']}\" (score {s['score']})\n"
+        historical_context += "Brug denne kontekst i 'opener' hvis det er relevant – fx 'Dette er anden gang på X måneder at dette emne er på dagsordenen'.\n"
+
     prompt = f"""Du er en strategisk analytiker for NEXTSTEP A/S – et dansk strategi- og innovationshus med speciale i Public Affairs og velfærdsforbedringer.
 
 Analyser denne artikel og vurder om den indeholder et lead for NEXTSTEP.
@@ -107,7 +178,7 @@ ARTIKEL:
 Kilde: {article['source']}
 Titel: {article['title']}
 Indhold: {article['summary'][:1000]}
-
+{historical_context}
 NEXTSTEP arbejder med to moduler:
 1. PUBLIC AFFAIRS: Virksomheder/organisationer der har brug for politisk dialog, reguleringsnavigation eller stakeholdermanagement. Minimum 50 ansatte eller 50+ mio. omsætning.
 2. VELFÆRD: Kommuner, regioner eller organisationer der har et komplekst problem de ikke kan løse selv – fx reformimplementering, strategisk procesledelse.
