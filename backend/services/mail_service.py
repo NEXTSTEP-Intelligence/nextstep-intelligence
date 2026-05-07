@@ -108,10 +108,10 @@ def build_approval_email(name: str, day_label: str, week: int, lead_count: int) 
     approve_url = f"{PLATFORM_URL}/rapport?godkend=1"
     return f"""<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#f2f0eb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+<body bgcolor="#f2f0eb" style="margin:0;padding:0;background:#f2f0eb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:32px 16px;">
 <table width="600" align="center" cellpadding="0" cellspacing="0" style="max-width:600px;">
-  <tr><td style="background:linear-gradient(135deg,#0d1b2e 0%,#1a2f4a 100%);border-radius:12px 12px 0 0;padding:28px 32px;">
+  <tr><td bgcolor="#0d1b2e" style="background:linear-gradient(135deg,#0d1b2e 0%,#1a2f4a 100%);border-radius:12px 12px 0 0;padding:28px 32px;">
     <div style="font-size:9px;letter-spacing:0.16em;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:6px;">NEXTSTEP · Scout NS</div>
     <div style="font-size:22px;font-weight:700;color:white;letter-spacing:-0.02em;">{day_label} · Uge {week} · 2026</div>
     <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">Politisk Radar klar til godkendelse</div>
@@ -154,12 +154,12 @@ def build_report_email(name: str, day_label: str, week: int, leads: list) -> str
 
     return f"""<!DOCTYPE html>
 <html><head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#f2f0eb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+<body bgcolor="#f2f0eb" style="margin:0;padding:0;background:#f2f0eb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:32px 16px;">
 <table width="620" align="center" cellpadding="0" cellspacing="0" style="max-width:620px;">
 
   <!-- Header -->
-  <tr><td style="background:linear-gradient(135deg,#0d1b2e 0%,#1a2f4a 100%);border-radius:12px 12px 0 0;padding:28px 32px;">
+  <tr><td bgcolor="#0d1b2e" style="background:linear-gradient(135deg,#0d1b2e 0%,#1a2f4a 100%);border-radius:12px 12px 0 0;padding:28px 32px;">
     <table width="100%" cellpadding="0" cellspacing="0"><tr>
       <td>
         <div style="font-size:9px;letter-spacing:0.16em;color:rgba(255,255,255,0.6);text-transform:uppercase;margin-bottom:4px;">NEXTSTEP · POLITISK RADAR · FORTROLIG</div>
