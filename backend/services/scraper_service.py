@@ -121,14 +121,15 @@ Svar KUN med JSON i dette format (eller null hvis ikke relevant):
   "summary": "2-3 sætninger om situationen",
   "module": "public_affairs" eller "velfaerd",
   "opgave_type": "Alliance", "Camp" eller "Entreprenør",
-  "sector": "primær sektor OG fokusområde fra denne struktur: SUNDHED (Psykiatri / Ældre / Trivsel / Arktis), FØDEVARER (Skolemad / Økologi), ENERGI (Geotermi / Fjernvarme / Vand), KLIMA (Fiskeri), BY OG BOLIG (Urban Rigger / Trivsel), BESKÆFTIGELSE, SIKKERHED (Beredskab / Arktis). Skriv fx: SUNDHED / Psykiatri eller ENERGI / Fjernvarme. Et lead kan have flere sektorer adskilt med komma.",
-  {starred_context}"score": 0-100. Vær meget differentieret og kritisk i din scoring. Brug hele skalaen:
-  90-100: Ekstraordinært lead. Stor kendt virksomhed (500+ ansatte) UDEN intern PA-kapabilitet, akut politisk pres eller lovgivning på vej, klart og konkret handlingsvindue NU. Eksempel: Novo Nordisk rammes af ny EU-regulering og har ikke talt med Christiansborg.
-  75-89: Stærkt lead. Relevant virksomhed eller organisation med identificerbar beslutningstager, konkret politisk situation der kræver handling inden for 1-3 måneder.
+  "sector": "primær sektor OG fokusområde fra denne struktur: SUNDHED (Psykiatri / Ældre / Trivsel), FØDEVARER (Skolemad / Økologi), ENERGI (Geotermi / Fjernvarme / Vand), KLIMA (Fiskeri), BY OG BOLIG (Urban Rigger / Trivsel), BESKÆFTIGELSE, SIKKERHED (Beredskab). Skriv fx: SUNDHED / Psykiatri eller ENERGI / Fjernvarme. Et lead kan have flere sektorer adskilt med komma.",
+  {starred_context}"score": 0-100. Vær meget differentieret og kritisk i din scoring. Brug hele skalaen.
+  NEXTSTEP arbejder primært med SMV'er (10-500 ansatte) der IKKE har intern PA- eller kommunikationskapacitet. Store virksomheder som Novo Nordisk, FLSmidth, Mærsk, DSV og andre med egne kommunikations- eller PA-afdelinger scorer LAVT – de har ikke brug for os.
+  90-100: Ekstraordinært lead. SMV (10-500 ansatte) UDEN intern PA-kapabilitet, akut politisk pres eller lovgivning på vej, klart handlingsvindue NU og identificerbar beslutningstager. Eksempel: Mellemstor dansk energivirksomhed rammes af ny regulering og har ingen lobbyist.
+  75-89: Stærkt lead. Relevant SMV eller brancheorganisation med konkret politisk situation der kræver handling inden for 1-3 måneder.
   60-74: Godt lead. Relevant emne og aktør men handlingsvinduet er uklart eller aktøren er svær at identificere præcist.
-  41-59: Svagt lead. Relevant emne men lille aktør, for generisk situation eller ingen klar indgang for NEXTSTEP.
-  0-40: Ikke relevant - gem ikke.
-  VIGTIGT: Undgå at give alle leads samme score. Spred dine vurderinger realistisk.,"
+  41-59: Svagt lead. Relevant emne men stor virksomhed med intern PA, for generisk situation eller ingen klar indgang for NEXTSTEP.
+  0-40: Ikke relevant – store virksomheder med intern PA, rent nyhedsstof uden handlingsvindue, eller emner uden for NEXTSTEPs sektorer.
+  VIGTIGT: Undgå at give alle leads samme score. Spred dine vurderinger realistisk.",
   "entity": "primær virksomhed eller organisation (kun ét navn)",
   "size_info": "antal ansatte eller borgere hvis nævnt",
   "stakeholders": [{{"name": "navn", "role": "rolle i sagen"}}],

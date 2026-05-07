@@ -1,8 +1,6 @@
 import httpx
 import os
 
-CVR_TOKEN = os.getenv("CVR_API_TOKEN", "")
-
 PUBLIC_KEYWORDS = [
     "kommune", "region", "ministeriet", "styrelsen", "rådet",
     "nævnet", "forbundet", "foreningen", "fonden", "instituttet",
@@ -25,45 +23,47 @@ async def lookup_cvr(entity: str) -> dict:
                 "cvr_verified": False,
             }
 
-    if not CVR_TOKEN:
-        return {"verified": False, "size_info": "", "skip": False, "public": False}
-
     try:
-        headers = {
-            "Authorization": f"Bearer {CVR_TOKEN}",
-            "Accept": "application/json",
-        }
-        params = {"navn": entity, "land": "dk"}
-
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            res = await client.get(
-                "https://api.cvr.dev/api/cvr/virksomhed",
-                headers=headers,
-                params=params
+        # Erhvervsstyrelsens officielle CVR API – ingen nøgle, ingen IP-whitelist
+        async with httpx.AsyncClient(timeout=8.0) as client:
+            res = await client.post(
+                "https://api.cvr.dk/cvr-permanent/elasticsearch/cvr-v2/_doc/_search",
+                headers={
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                },
+                json={
+                    "query": {
+                        "multi_match": {
+                            "query": entity,
+                            "fields": ["Vrvirksomhed.virksomhedMetadata.nyesteNavn.navn"],
+                            "operator": "and"
+                        }
+                    },
+                    "size": 1
+                }
             )
 
-        print(f"CVR API status {res.status_code} for {entity}, content-type: {res.headers.get('content-type', 'unknown')}, body: {res.text[:200]}")
+        print(f"CVR status {res.status_code} for {entity}, body: {res.text[:300]}")
+
         if res.status_code != 200:
-            print(f"CVR API fejl {res.status_code} for {entity}")
             return {"verified": False, "size_info": "", "skip": False, "public": False}
 
         data = res.json()
-        items = data if isinstance(data, list) else data.get("items", [])
-
-        if not items:
+        hits = data.get("hits", {}).get("hits", [])
+        if not hits:
             return {"verified": False, "size_info": "", "skip": False, "public": False}
 
-        virk = items[0]
-        
-        # Hent antal ansatte fra virksomhedMetadata
+        virk = hits[0].get("_source", {}).get("Vrvirksomhed", {})
+
+        # Hent ansatte fra nyesteAarsbeskaeftigelse
         ansatte = 0
         metadata = virk.get("virksomhedMetadata", {})
-        if metadata:
-            besk = metadata.get("nyesteAarsbeskaeftigelse", {})
-            if besk:
-                ansatte = besk.get("antalAnsatte", 0) or 0
-        
-        # Fallback: prøv aarsbeskaeftigelse array
+        besk = metadata.get("nyesteAarsbeskaeftigelse", {})
+        if besk:
+            ansatte = besk.get("antalAnsatte", 0) or 0
+
+        # Fallback: aarsbeskaeftigelse array
         if not ansatte:
             besk_list = virk.get("aarsbeskaeftigelse", [])
             if besk_list:
@@ -71,14 +71,18 @@ async def lookup_cvr(entity: str) -> dict:
                 if latest:
                     ansatte = latest[0].get("antalAnsatte", 0) or 0
 
-        print(f"CVR: {entity} har {ansatte} ansatte")
+        print(f"CVR: {entity} → {ansatte} ansatte")
+
+        # SMV-fokus: 10-500 ansatte er relevante
+        is_smv = 10 <= ansatte <= 500
 
         return {
-            "verified": ansatte >= 50,
+            "verified": is_smv,
             "size_info": f"{ansatte} ansatte" if ansatte else "",
-            "skip": False,
+            "skip": ansatte > 500,  # Spring over hvis stor virksomhed med intern PA
             "public": False,
-            "cvr_verified": ansatte >= 50,
+            "cvr_verified": ansatte >= 10,
+            "ansatte": ansatte,
         }
 
     except Exception as e:
