@@ -238,12 +238,6 @@ export default function Dashboard() {
               <p style={{ fontSize: 12, color: 'var(--ink-3)', marginTop: 4 }}>
                 Opdateret kl. {String(now.getHours()).padStart(2,'0')}:{String(now.getMinutes()).padStart(2,'0')} · {`${getNextRapport()}`}
               </p>
-              {!isLoading && leads.length > 0 && (
-                <p style={{ fontSize: 11, color: 'var(--ink-3)', marginTop: 3 }}>
-                  <span style={{ fontWeight: 600, color: leads.length >= 50 ? 'var(--gold)' : 'var(--ink-2)' }}>{leads.length}</span>
-                  <span style={{ color: 'var(--ink-3)' }}>/50 leads</span>
-                </p>
-              )}
             </div>
             <button onClick={() => router.push('/rapport')} style={{ fontSize: 12, fontWeight: 500, padding: '8px 18px', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(0,0,0,0.12)', background: 'var(--surface)', color: 'var(--ink)', whiteSpace: 'nowrap', cursor: 'pointer' }}>
               Generer rapport ↗
