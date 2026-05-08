@@ -3,7 +3,7 @@ import anthropic
 import json
 import os
 from datetime import datetime
-from services.db_service import save_lead, article_exists, find_existing_lead, update_lead, find_similar_leads
+from services.db_service import save_lead, article_exists, find_existing_lead, update_lead, find_similar_leads, search_guldkatalog, search_guldkatalog, search_guldkatalog
 from services.cvr_service import lookup_cvr
 
 # Danske nyhedskilder - RSS feeds
@@ -170,6 +170,39 @@ async def analyze_article(article: dict) -> dict | None:
                 historical_context += f"- \"{s['title']}\" (score {s['score']})\n"
         historical_context += "Brug denne kontekst i 'opener' hvis det er relevant – fx 'Dette er anden gang på X måneder at dette emne er på dagsordenen'.\n"
 
+    rag_query = f"{article.get('title', '')} {article.get('summary', '')[:300]}"
+    guldkatalog_matches = await search_guldkatalog(rag_query, match_count=4)
+    guldkatalog_context = ""
+    if guldkatalog_matches:
+        guldkatalog_context = "\n\nNEXTSTEP GULDKATALOG – relevante cases og erfaringer:\n"
+        for match in guldkatalog_matches:
+            source_label = "Aktuel kunde" if match.get("source_type") == "aktuel_kunde" else "Tidligere case"
+            content_preview = match.get("content", "")[:200]
+            guldkatalog_context += f"[{source_label} – {match.get('filename', '')}]: {content_preview}...\n\n"
+        guldkatalog_context += "Brug ovenstående cases aktivt i 'opener'.\n"
+
+    rag_query = f"{article.get('title', '')} {article.get('summary', '')[:300]}"
+    guldkatalog_matches = await search_guldkatalog(rag_query, match_count=4)
+    guldkatalog_context = ""
+    if guldkatalog_matches:
+        guldkatalog_context = "\n\nNEXTSTEP GULDKATALOG – relevante cases og erfaringer:\n"
+        for match in guldkatalog_matches:
+            source_label = "Aktuel kunde" if match.get("source_type") == "aktuel_kunde" else "Tidligere case"
+            content_preview = match.get("content", "")[:200]
+            guldkatalog_context += f"[{source_label} – {match.get('filename', '')}]: {content_preview}...\n\n"
+        guldkatalog_context += "Brug ovenstående cases aktivt i 'opener'.\n"
+
+    rag_query = f"{article.get('title', '')} {article.get('summary', '')[:300]}"
+    guldkatalog_matches = await search_guldkatalog(rag_query, match_count=4)
+    guldkatalog_context = ""
+    if guldkatalog_matches:
+        guldkatalog_context = "\n\nNEXTSTEP GULDKATALOG – relevante cases og erfaringer:\n"
+        for match in guldkatalog_matches:
+            source_label = "Aktuel kunde" if match.get("source_type") == "aktuel_kunde" else "Tidligere case"
+            content_preview = match.get("content", "")[:200]
+            guldkatalog_context += f"[{source_label} – {match.get('filename', '')}]: {content_preview}...\n\n"
+        guldkatalog_context += "Brug ovenstående cases aktivt i 'opener'.\n"
+
     prompt = f"""Du er en strategisk analytiker for NEXTSTEP A/S – et dansk strategi- og innovationshus med speciale i Public Affairs og velfærdsforbedringer.
 
 Analyser denne artikel og vurder om den indeholder et lead for NEXTSTEP.
@@ -178,7 +211,7 @@ ARTIKEL:
 Kilde: {article['source']}
 Titel: {article['title']}
 Indhold: {article['summary'][:1000]}
-{historical_context}
+{historical_context}{guldkatalog_context}
 NEXTSTEP arbejder med to moduler:
 1. PUBLIC AFFAIRS: Virksomheder/organisationer der har brug for politisk dialog, reguleringsnavigation eller stakeholdermanagement. Minimum 50 ansatte eller 50+ mio. omsætning.
 2. VELFÆRD: Kommuner, regioner eller organisationer der har et komplekst problem de ikke kan løse selv – fx reformimplementering, strategisk procesledelse.

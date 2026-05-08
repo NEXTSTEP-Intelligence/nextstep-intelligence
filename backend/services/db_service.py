@@ -142,6 +142,36 @@ async def cleanup_old_leads() -> int:
         print(f"Oprydning fejl: {e}")
         return 0
 
+
+async def search_guldkatalog(query_text: str, match_count: int = 4) -> list:
+    """Søg i Guldkataloget via embedding-similaritet."""
+    client = get_client()
+    if not client:
+        return []
+    try:
+        import httpx
+        openai_key = os.getenv("OPENAI_API_KEY", "")
+        if not openai_key:
+            return []
+        async with httpx.AsyncClient(timeout=10.0) as http:
+            resp = await http.post(
+                "https://api.openai.com/v1/embeddings",
+                headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"},
+                json={"input": query_text[:8000], "model": "text-embedding-3-small"}
+            )
+        if resp.status_code != 200:
+            return []
+        embedding = resp.json()["data"][0]["embedding"]
+        result = client.rpc("search_guldkatalog", {
+            "query_embedding": embedding,
+            "match_count": match_count,
+            "min_similarity": 0.45
+        }).execute()
+        return result.data or []
+    except Exception as e:
+        print(f"RAG søgefejl: {e}")
+        return []
+
 async def find_similar_leads(entity: str, sector: str, days: int = 365) -> list:
     """Find tidligere leads med samme entity eller sektor – til historisk kontekst."""
     client = get_client()
