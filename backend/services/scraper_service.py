@@ -233,7 +233,11 @@ Svar KUN med JSON i dette format (eller null hvis ikke relevant):
   60-74: Godt lead. Relevant emne og aktør men handlingsvinduet er uklart eller aktøren er svær at identificere præcist.
   41-59: Svagt lead. Relevant emne men stor virksomhed med intern PA, for generisk situation eller ingen klar indgang for NEXTSTEP.
   0-40: Ikke relevant – store virksomheder med intern PA, rent nyhedsstof uden handlingsvindue, eller emner uden for NEXTSTEPs sektorer.
-  KRITISK VIGTIGT FOR SCORING: Hvert lead skal have sin helt egen unikke score. Tænk på det som en eksaminator der bedømmer individuelle opgaver – ingen to studerende får præcis samme karakter medmindre de har lavet nøjagtigt det samme. Vej hvert lead på dets egne specifikke meritter: styrken af det politiske handlingsvindue, aktørens størrelse og PA-kapacitet, timing og konkrethed. En forskel på bare 1-2 point er bedre end identiske scores.",
+  SCORING-REGLER – følg disse præcist:
+  1. Scores SKAL være dramatisk spredte. Forvent at de fleste leads scorer 38-55. Kun 1-2 leads per scrape-kørsel må score over 70. Hvis mere end 3 leads scorer det samme tal, har du fejlet.
+  2. Tænk på det som en investeringsanalyse: de fleste muligheder er middelmådige (40-55), få er gode (56-70), og sjældent er noget fremragende (71+).
+  3. Brug alle cifre – ikke kun 52, 58, 62, 68, 72. Brug 41, 47, 53, 57, 63, 67, 71, 74, 79 osv.
+  4. En artikel om en stor virksomhed med intern PA-afdeling må ALDRIG score over 45 uanset nyhedsværdi.",
   "entity": "primær virksomhed eller organisation (kun ét navn)",
   "size_info": "antal ansatte eller borgere hvis nævnt",
   "stakeholders": [{{"name": "navn", "role": "rolle i sagen"}}],
