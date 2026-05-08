@@ -163,7 +163,7 @@ export default function RapportPage() {
         setTimeout(poll, 2000)
       }).catch(() => setLoading(false))
     } else {
-      fetch('/api/leads?limit=20&sort=score')
+      fetch('/api/leads?limit=25&sort=score')
         .then(r => r.json())
         .then(d => { setLeads(d.leads || []); setLoading(false) })
         .catch(() => setLoading(false))

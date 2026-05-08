@@ -12,7 +12,7 @@ def get_client() -> Client:
             _client = create_client(url, key)
     return _client
 
-async def get_leads(module: str = None, limit: int = 50, sort: str = "score", days: int = None) -> list:
+async def get_leads(module: str = None, limit: int = 25, sort: str = "score", days: int = None) -> list:
     client = get_client()
     if not client:
         return []

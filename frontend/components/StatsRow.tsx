@@ -3,7 +3,7 @@
 type Props = { total: number; pa: number; vel: number; rebizz: number; onDaysChange: (days: number) => void; activeDays: number; totalByDays?: Record<number, number> }
 
 export default function StatsRow({ total, pa, vel, rebizz, onDaysChange, activeDays, totalByDays = {} }: Props) {
-  const MAX_LEADS = 50
+  const MAX_LEADS = 25
   return (
     <div style={{ marginBottom: 4 }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 8 }}>

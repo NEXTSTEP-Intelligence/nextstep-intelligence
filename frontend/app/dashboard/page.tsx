@@ -111,7 +111,7 @@ export default function Dashboard() {
   const [totalByDays, setTotalByDays] = useState<Record<number, number>>({})
 
   const fetchLeads = (sortBy: string) => {
-    fetch(`/api/leads?sort=${sortBy}&days=${activeDays}&limit=50`).then(r => r.json()).then(d => {
+    fetch(`/api/leads?sort=${sortBy}&days=${activeDays}&limit=25`).then(r => r.json()).then(d => {
       if (d.leads?.length) {
         setLeads(d.leads)
         setIsLoading(false)
@@ -168,8 +168,8 @@ export default function Dashboard() {
     fetchLeads(sort)
     // Hent totaler for dag-filtre
     Promise.all([
-      fetch('/api/leads?sort=score&days=7&limit=50').then(r => r.json()),
-      fetch('/api/leads?sort=score&days=30&limit=50').then(r => r.json()),
+      fetch('/api/leads?sort=score&days=7&limit=25').then(r => r.json()),
+      fetch('/api/leads?sort=score&days=30&limit=25').then(r => r.json()),
     ]).then(([d7, d30]) => {
       setTotalByDays({ 7: d7.leads?.length || 0, 30: d30.leads?.length || 0 })
     }).catch(() => {})
@@ -183,7 +183,7 @@ export default function Dashboard() {
 
   const handleDays = (d: number) => {
     setActiveDays(d)
-    fetch(`/api/leads?sort=${sort}&days=${d}&limit=50`).then(r => r.json()).then(data => {
+    fetch(`/api/leads?sort=${sort}&days=${d}&limit=25`).then(r => r.json()).then(data => {
       if (data.leads?.length) setLeads(data.leads)
       else setLeads([])
     }).catch(() => {})

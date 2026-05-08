@@ -195,12 +195,12 @@ Svar KUN med JSON i dette format (eller null hvis ikke relevant):
   "sector": "primær sektor OG fokusområde fra denne struktur: SUNDHED (Psykiatri / Ældre / Trivsel), FØDEVARER (Skolemad / Økologi), ENERGI (Geotermi / Fjernvarme / Vand), KLIMA (Fiskeri), BY OG BOLIG (Urban Rigger / Trivsel), BESKÆFTIGELSE, SIKKERHED (Beredskab). Skriv fx: SUNDHED / Psykiatri eller ENERGI / Fjernvarme. Et lead kan have flere sektorer adskilt med komma.",
   {starred_context}"score": 0-100. Vær meget differentieret og kritisk i din scoring. Brug hele skalaen.
   NEXTSTEP arbejder primært med SMV'er (10-500 ansatte) der IKKE har intern PA- eller kommunikationskapacitet. Store virksomheder som Novo Nordisk, FLSmidth, Mærsk, DSV og andre med egne kommunikations- eller PA-afdelinger scorer LAVT – de har ikke brug for os.
-  90-100: Ekstraordinært lead. SMV (10-500 ansatte) UDEN intern PA-kapabilitet, akut politisk pres eller lovgivning på vej, klart handlingsvindue NU og identificerbar beslutningstager. Eksempel: Mellemstor dansk energivirksomhed rammes af ny regulering og har ingen lobbyist.
+  90-100: Ekstraordinært lead. SMV (10-500 ansatte) UDEN intern PA-kapabilitet, akut politisk pres eller lovgivning på vej, klart handlingsvindue NU og identificerbar beslutningstager.
   75-89: Stærkt lead. Relevant SMV eller brancheorganisation med konkret politisk situation der kræver handling inden for 1-3 måneder.
   60-74: Godt lead. Relevant emne og aktør men handlingsvinduet er uklart eller aktøren er svær at identificere præcist.
   41-59: Svagt lead. Relevant emne men stor virksomhed med intern PA, for generisk situation eller ingen klar indgang for NEXTSTEP.
   0-40: Ikke relevant – store virksomheder med intern PA, rent nyhedsstof uden handlingsvindue, eller emner uden for NEXTSTEPs sektorer.
-  VIGTIGT: Undgå at give alle leads samme score. Spred dine vurderinger realistisk.",
+  KRITISK VIGTIGT FOR SCORING: Hvert lead skal have sin helt egen unikke score. Tænk på det som en eksaminator der bedømmer individuelle opgaver – ingen to studerende får præcis samme karakter medmindre de har lavet nøjagtigt det samme. Vej hvert lead på dets egne specifikke meritter: styrken af det politiske handlingsvindue, aktørens størrelse og PA-kapacitet, timing og konkrethed. En forskel på bare 1-2 point er bedre end identiske scores.",
   "entity": "primær virksomhed eller organisation (kun ét navn)",
   "size_info": "antal ansatte eller borgere hvis nævnt",
   "stakeholders": [{{"name": "navn", "role": "rolle i sagen"}}],
