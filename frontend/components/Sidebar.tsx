@@ -28,7 +28,7 @@ export default function Sidebar({ activeModule, setActiveModule }: Props) {
       <div style={{ padding: '4px 14px 20px', marginBottom: 4 }}>
         <div style={{ fontSize: 10, letterSpacing: '0.12em', color: 'var(--ink-3)', textTransform: 'uppercase', marginBottom: 4 }}>NEXTSTEP</div>
         <div style={{ fontSize: 17, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.02em' }}>Intelligence</div>
-        <div style={{ fontSize: 10, color: 'var(--ink-3)', marginTop: 1 }}>Scout NS · v0.1</div>
+        <div style={{ fontSize: 10, color: 'var(--ink-3)', marginTop: 1 }}>Scout NS · v0.2</div>
       </div>
       <div style={{ fontSize: 10, letterSpacing: '0.09em', color: 'var(--ink-3)', textTransform: 'uppercase', padding: '0 14px', marginBottom: 3 }}>Overblik</div>
       {btn('Alle moduler', 'alle')}
