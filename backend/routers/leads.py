@@ -22,3 +22,16 @@ async def star_lead(lead_id: str, body: dict = {}):
 async def reset_stars():
     await reset_all_stars()
     return {"status": "ok"}
+
+@router.post("/build-index")
+async def build_index():
+    """Midlertidigt endpoint til at bygge ivfflat indeks."""
+    from services.db_service import get_client
+    import asyncio
+    client = get_client()
+    try:
+        client.postgrest.session.timeout = 600
+        client.rpc("build_guldkatalog_index").execute()
+        return {"status": "indeks bygget"}
+    except Exception as e:
+        return {"status": "fejl", "error": str(e)}
