@@ -3,7 +3,7 @@ import anthropic
 import json
 import os
 from datetime import datetime
-from services.db_service import save_lead, article_exists, find_existing_lead, update_lead, find_similar_leads, search_guldkatalog, search_guldkatalog, search_guldkatalog
+from services.db_service import save_lead, article_exists, find_existing_lead, update_lead, find_similar_leads, search_guldkatalog
 from services.cvr_service import lookup_cvr
 
 # Danske nyhedskilder - RSS feeds
@@ -115,6 +115,8 @@ async def run_scraper() -> int:
             entity = lead.get("entity", "")
             existing = await find_existing_lead(entity) if entity else None
             if existing:
+                if (existing.get("update_count") or 0) >= 3:
+                    continue  # Stop opdatering efter 3 gange
                 new_score = max(existing.get("score", 0), lead.get("score", 0))
                 update_count = (existing.get("update_count") or 0) + 1
                 await update_lead(existing["id"], {
