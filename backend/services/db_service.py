@@ -153,7 +153,7 @@ async def search_guldkatalog(query_text: str, match_count: int = 4) -> list:
         openai_key = os.getenv("OPENAI_API_KEY", "")
         if not openai_key:
             return []
-        async with httpx.AsyncClient(timeout=10.0) as http:
+        async with httpx.AsyncClient(timeout=5.0) as http:
             resp = await http.post(
                 "https://api.openai.com/v1/embeddings",
                 headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"},
