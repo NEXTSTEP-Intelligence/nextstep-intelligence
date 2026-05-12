@@ -228,23 +228,20 @@ Svar KUN med JSON i dette format (eller null hvis ikke relevant):
   "module": "public_affairs" eller "velfaerd",
   "opgave_type": "Alliance", "Camp" eller "Entreprenør",
   "sector": "primær sektor OG fokusområde fra denne struktur: SUNDHED (Psykiatri / Ældre / Trivsel), FØDEVARER (Skolemad / Økologi), ENERGI (Geotermi / Fjernvarme / Vand), KLIMA (Fiskeri), BY OG BOLIG (Urban Rigger / Trivsel), BESKÆFTIGELSE, SIKKERHED (Beredskab). Skriv fx: SUNDHED / Psykiatri eller ENERGI / Fjernvarme. Et lead kan have flere sektorer adskilt med komma.",
-  {starred_context}"score": 0-100. Vær meget differentieret og kritisk i din scoring. Brug hele skalaen.
-  NEXTSTEP arbejder primært med SMV'er (10-500 ansatte) der IKKE har intern PA- eller kommunikationskapacitet. Store virksomheder som Novo Nordisk, FLSmidth, Mærsk, DSV og andre med egne kommunikations- eller PA-afdelinger scorer LAVT – de har ikke brug for os.
-  90-100: Ekstraordinært lead. SMV (10-500 ansatte) UDEN intern PA-kapabilitet, akut politisk pres eller lovgivning på vej, klart handlingsvindue NU og identificerbar beslutningstager.
-  75-89: Stærkt lead. Relevant SMV eller brancheorganisation med konkret politisk situation der kræver handling inden for 1-3 måneder.
-  60-74: Godt lead. Relevant emne og aktør men handlingsvinduet er uklart eller aktøren er svær at identificere præcist.
-  41-59: Svagt lead. Relevant emne men stor virksomhed med intern PA, for generisk situation eller ingen klar indgang for NEXTSTEP.
-  0-40: Ikke relevant – store virksomheder med intern PA, rent nyhedsstof uden handlingsvindue, eller emner uden for NEXTSTEPs sektorer.
-  SCORING-REGLER – følg disse præcist:
-  1. Scores SKAL være dramatisk spredte. Forvent at de fleste leads scorer 38-55. Kun 1-2 leads per scrape-kørsel må score over 70. Hvis mere end 3 leads scorer det samme tal, har du fejlet.
-  2. Tænk på det som en investeringsanalyse: de fleste muligheder er middelmådige (40-55), få er gode (56-70), og sjældent er noget fremragende (71+).
-  3. Brug alle cifre – ikke kun 52, 58, 62, 68, 72. Brug 41, 47, 53, 57, 63, 67, 71, 74, 79 osv.
-  4. En artikel om en stor virksomhed med intern PA-afdeling må ALDRIG score over 45 uanset nyhedsværdi.",
+  {starred_context}"score": 0-100. KRITISK: Scores SKAL sprede sig dramatisk – du FEJLER hvis mange leads ligger i samme interval.
+  NEXTSTEP arbejder med SMV'er (10-500 ansatte) UDEN intern PA. Store virksomheder som Novo Nordisk, FLSmidth, Mærsk, DSV scorer ALDRIG over 40.
+  FORVENTET FORDELING per scrape-kørsel:
+  80-100: MAX 1 lead. Perfekt SMV-match, akut politisk pres NU, navngiven beslutningstager, NEXTSTEP har dokumenteret erfaring med præcis dette emne.
+  65-79: MAX 2-3 leads. Stærkt lead, klart politisk vindue inden for 4 uger, identificerbar aktør.
+  50-64: 4-6 leads. Godt emne men handlingsvindue uklart eller aktør svær at nå.
+  38-49: Resten. Relevant men generisk, stor aktør, eller ingen klar indgang.
+  0-37: Filtreres væk – ikke relevant.
+  REGLER: Brug præcise tal som 41, 47, 53, 57, 63, 67, 71, 74, 79, 83. ALDRIG runde tal. ALDRIG mere end 2 leads med samme score.",
   "entity": "primær virksomhed eller organisation (kun ét navn)",
   "size_info": "antal ansatte eller borgere hvis nævnt",
   "stakeholders": [{{"name": "navn", "role": "rolle i sagen"}}],
   "potential_partners": [{{"name": "navn", "role": "hvorfor relevant"}}],
-  "gold_matches": [],
+  "gold_matches": ["List kun meningsfulde case-titler fra NEXTSTEP Erfaringer ovenfor – skriv titlen kort og læsbart, ikke filnavnet"],
   "opener": "konkret indgangsvinkel til første henvendelse"
 }}"""
 
