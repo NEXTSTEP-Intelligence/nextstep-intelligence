@@ -96,16 +96,7 @@ export default function LeadCard({ lead, hideStars }: Props) {
           )}
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, alignItems: 'center' }}>
-            {lead.gold_matches?.length > 0 && (
-              <div style={{ fontSize: 12, color: 'var(--ink-3)' }}>
-                NEXTSTEP Erfaringer:{' '}
-                {lead.gold_matches.map((m, i) => {
-                  const raw = typeof m === 'string' ? m : (m.title || String(m))
-                  const clean = raw.replace(/Aktuel kunde – |Tidligere case – /gi, '').replace(/\.pdf|\.docx|\.pptx/gi, '').replace(/\s*\([^)]*\)\s*/g, ' ').trim()
-                  return (
-                    <span key={i}><span style={{ color: 'var(--gold)', fontWeight: 500 }}>{clean}</span>{i < lead.gold_matches.length - 1 ? ' · ' : ''}</span>
-                  )
-                })}
+            
               </div>
             )}
             <div style={{ fontSize: 12, color: 'var(--ink-3)' }}>
