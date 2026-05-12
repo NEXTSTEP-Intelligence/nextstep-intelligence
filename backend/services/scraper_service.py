@@ -241,7 +241,7 @@ Svar KUN med JSON i dette format (eller null hvis ikke relevant):
   "size_info": "antal ansatte eller borgere hvis nævnt",
   "stakeholders": [{{"name": "navn", "role": "rolle i sagen"}}],
   "potential_partners": [{{"name": "navn", "role": "hvorfor relevant"}}],
-  "gold_matches": ["List kun meningsfulde case-titler fra NEXTSTEP Erfaringer ovenfor – skriv titlen kort og læsbart, ikke filnavnet"],
+  "gold_matches": ["Skriv KUN korte projektnavne – fx 'Demensalliancen', 'Nordic Safe Cities', 'Vand i Balance'. Aldrig beskrivelser, aldrig filnavne, aldrig sætninger. Max 3 ord per match."],
   "opener": "konkret indgangsvinkel til første henvendelse"
 }}"""
 
