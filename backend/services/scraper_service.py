@@ -109,14 +109,22 @@ async def run_scraper() -> int:
         except Exception as e:
             print(f"Fejl ved hentning af {feed_info['name']}: {e}")
 
-    for article in all_articles:
-        lead = await analyze_article(article)
-        if lead:
+    # Analyser i batches af 8 for at tvinge relativ scoring
+    BATCH_SIZE = 8
+    for batch_start in range(0, len(all_articles), BATCH_SIZE):
+        batch = all_articles[batch_start:batch_start + BATCH_SIZE]
+        print(f"Analyserer batch {batch_start//BATCH_SIZE + 1} ({len(batch)} artikler)...")
+        leads = await analyze_articles_batch(batch)
+        for lead in leads:
+            if not lead or not lead.get("relevant"):
+                continue
+            if lead.get("score", 0) < 38:
+                continue
             entity = lead.get("entity", "")
             existing = await find_existing_lead(entity) if entity else None
             if existing:
                 if (existing.get("update_count") or 0) >= 3:
-                    continue  # Stop opdatering efter 3 gange
+                    continue
                 new_score = max(existing.get("score", 0), lead.get("score", 0))
                 update_count = (existing.get("update_count") or 0) + 1
                 await update_lead(existing["id"], {
@@ -127,7 +135,6 @@ async def run_scraper() -> int:
                 })
                 print(f"Opdateret: {entity} (#{update_count})")
             else:
-                # CVR-tjek
                 cvr = await lookup_cvr(entity)
                 lead["cvr_verified"] = cvr.get("cvr_verified", False)
                 if cvr.get("size_info"):
@@ -152,6 +159,109 @@ async def get_starred_examples() -> str:
     except:
         return ""
 
+
+async def analyze_articles_batch(articles: list) -> list:
+    """Analyser en batch af artikler på én gang og tving relativ scoring."""
+    if not articles:
+        return []
+
+    starred_context = await get_starred_examples()
+
+    # Byg RAG-kontekst for hele batchen
+    rag_context = ""
+    for i, article in enumerate(articles):
+        rag_query = f"{article.get('title', '')} {article.get('summary', '')[:200]}"
+        matches = await search_guldkatalog(rag_query, match_count=2)
+        if matches:
+            rag_context += f"\nArtikel {i+1} relevante NEXTSTEP-erfaringer:\n"
+            for m in matches:
+                source_label = "Aktuel kunde" if m.get("source_type") == "aktuel_kunde" else "Tidligere case"
+                rag_context += f"  [{source_label}]: {m.get('content', '')[:150]}...\n"
+
+    articles_text = ""
+    for i, article in enumerate(articles):
+        articles_text += f"""
+ARTIKEL {i+1}:
+Kilde: {article['source']}
+Titel: {article['title']}
+Indhold: {article.get('summary', '')[:400]}
+"""
+
+    prompt = f"""Du er en strategisk analytiker for NEXTSTEP A/S – et dansk strategi- og innovationshus med speciale i Public Affairs og velfærdsforbedringer.
+
+Analyser disse {len(articles)} artikler og vurder hvilke der er leads for NEXTSTEP.
+
+{articles_text}
+
+NEXTSTEP-BAGGRUNDSVIDEN fra vores Guldkatalog og aktuelle kunder (brug til at forstå hvad NEXTSTEP kan):
+{rag_context if rag_context else "Ingen specifik kontekst fundet."}
+
+NEXTSTEP arbejder med:
+1. PUBLIC AFFAIRS: Virksomheder/organisationer der har brug for politisk dialog, reguleringsnavigation eller stakeholdermanagement.
+2. VELFÆRD: Kommuner, regioner eller organisationer med komplekse problemer de ikke kan løse selv.
+
+Opgavetyper: Alliance (samle aktører), Camp (workshop/faciliteringsproces), Entreprenør (vi driver forandringen frem).
+
+SCORING – ABSOLUT KRITISK – du SKAL differentiere markant:
+- Fordel scores over hele skalaen: de bedste artikler 65-85, middel 45-64, svage 38-44, irrelevante 0-37
+- ALDRIG mere end 2 artikler med identisk score i hele batchen
+- Store virksomheder med intern PA (Novo Nordisk, FLSmidth, Mærsk, DSV, Nordea) scorer ALDRIG over 40
+- SMV uden PA-kapacitet + akut politisk pres + navngiven beslutningstager = 70-85
+- Generiske politiske nyheder uden klar aktør = 38-44
+- Irrelevante artikler = 0-37, relevant: false
+{starred_context}
+Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artiklerne ovenfor:
+[
+  {{
+    "artikel_nr": 1,
+    "relevant": true/false,
+    "title": "artikel-titel",
+    "summary": "2-3 sætninger om situationen og NEXTSTEPs mulighed",
+    "module": "public_affairs" eller "velfaerd",
+    "opgave_type": "Alliance", "Camp" eller "Entreprenør",
+    "sector": "SUNDHED / Psykiatri osv.",
+    "score": 0-100,
+    "entity": "primær virksomhed eller organisation",
+    "size_info": "antal ansatte hvis nævnt",
+    "stakeholders": [{{"name": "navn", "role": "rolle"}}],
+    "potential_partners": [{{"name": "navn", "role": "hvorfor relevant"}}],
+    "gold_matches": [],
+    "opener": "konkret indgangsvinkel til første henvendelse"
+  }}
+]"""
+
+    try:
+        client = get_anthropic_client()
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=8000,
+            messages=[{"role": "user", "content": prompt}]
+        )
+        text = response.content[0].text.strip()
+        if text.startswith("```"):
+            text = text.split("```")[1]
+            if text.startswith("json"):
+                text = text[4:]
+        text = text.rstrip("`").strip()
+        results = json.loads(text)
+        if not isinstance(results, list):
+            return []
+        output = []
+        for item in results:
+            nr = item.get("artikel_nr", 1) - 1
+            if 0 <= nr < len(articles):
+                article = articles[nr]
+                item["url"] = article["url"]
+                item["source"] = article["source"]
+                item["published_at"] = article["published"]
+                item["cvr_verified"] = False
+                output.append(item)
+        return output
+    except Exception as e:
+        print(f"Batch analyse fejl: {e}")
+        return []
+
+
 async def analyze_article(article: dict) -> dict | None:
     starred_context = await get_starred_examples()
 
@@ -172,6 +282,7 @@ async def analyze_article(article: dict) -> dict | None:
                 historical_context += f"- \"{s['title']}\" (score {s['score']})\n"
         historical_context += "Brug denne kontekst i 'opener' hvis det er relevant – fx 'Dette er anden gang på X måneder at dette emne er på dagsordenen'.\n"
 
+    # Hent relevante cases fra Guldkataloget via RAG
     rag_query = f"{article.get('title', '')} {article.get('summary', '')[:300]}"
     guldkatalog_matches = await search_guldkatalog(rag_query, match_count=4)
     guldkatalog_context = ""
@@ -181,29 +292,7 @@ async def analyze_article(article: dict) -> dict | None:
             source_label = "Aktuel kunde" if match.get("source_type") == "aktuel_kunde" else "Tidligere case"
             content_preview = match.get("content", "")[:200]
             guldkatalog_context += f"[{source_label} – {match.get('filename', '')}]: {content_preview}...\n\n"
-        guldkatalog_context += "Brug ovenstående cases aktivt i 'opener'.\n"
-
-    rag_query = f"{article.get('title', '')} {article.get('summary', '')[:300]}"
-    guldkatalog_matches = await search_guldkatalog(rag_query, match_count=4)
-    guldkatalog_context = ""
-    if guldkatalog_matches:
-        guldkatalog_context = "\n\nNEXTSTEP GULDKATALOG – relevante cases og erfaringer:\n"
-        for match in guldkatalog_matches:
-            source_label = "Aktuel kunde" if match.get("source_type") == "aktuel_kunde" else "Tidligere case"
-            content_preview = match.get("content", "")[:200]
-            guldkatalog_context += f"[{source_label} – {match.get('filename', '')}]: {content_preview}...\n\n"
-        guldkatalog_context += "Brug ovenstående cases aktivt i 'opener'.\n"
-
-    rag_query = f"{article.get('title', '')} {article.get('summary', '')[:300]}"
-    guldkatalog_matches = await search_guldkatalog(rag_query, match_count=4)
-    guldkatalog_context = ""
-    if guldkatalog_matches:
-        guldkatalog_context = "\n\nNEXTSTEP GULDKATALOG – relevante cases og erfaringer:\n"
-        for match in guldkatalog_matches:
-            source_label = "Aktuel kunde" if match.get("source_type") == "aktuel_kunde" else "Tidligere case"
-            content_preview = match.get("content", "")[:200]
-            guldkatalog_context += f"[{source_label} – {match.get('filename', '')}]: {content_preview}...\n\n"
-        guldkatalog_context += "Brug ovenstående cases aktivt i 'opener'.\n"
+        guldkatalog_context += "Brug ovenstående cases aktivt i 'opener' – fx 'NEXTSTEP har erfaring med lignende situationer fra [case]' eller 'Vi arbejder allerede med [aktuel kunde] om dette område'.\n"
 
     prompt = f"""Du er en strategisk analytiker for NEXTSTEP A/S – et dansk strategi- og innovationshus med speciale i Public Affairs og velfærdsforbedringer.
 
@@ -228,15 +317,14 @@ Svar KUN med JSON i dette format (eller null hvis ikke relevant):
   "module": "public_affairs" eller "velfaerd",
   "opgave_type": "Alliance", "Camp" eller "Entreprenør",
   "sector": "primær sektor OG fokusområde fra denne struktur: SUNDHED (Psykiatri / Ældre / Trivsel), FØDEVARER (Skolemad / Økologi), ENERGI (Geotermi / Fjernvarme / Vand), KLIMA (Fiskeri), BY OG BOLIG (Urban Rigger / Trivsel), BESKÆFTIGELSE, SIKKERHED (Beredskab). Skriv fx: SUNDHED / Psykiatri eller ENERGI / Fjernvarme. Et lead kan have flere sektorer adskilt med komma.",
-  {starred_context}"score": 0-100. KRITISK: Scores SKAL sprede sig dramatisk – du FEJLER hvis mange leads ligger i samme interval.
-  NEXTSTEP arbejder med SMV'er (10-500 ansatte) UDEN intern PA. Store virksomheder som Novo Nordisk, FLSmidth, Mærsk, DSV scorer ALDRIG over 40.
-  FORVENTET FORDELING per scrape-kørsel:
-  80-100: MAX 1 lead. Perfekt SMV-match, akut politisk pres NU, navngiven beslutningstager, NEXTSTEP har dokumenteret erfaring med præcis dette emne.
-  65-79: MAX 2-3 leads. Stærkt lead, klart politisk vindue inden for 4 uger, identificerbar aktør.
-  50-64: 4-6 leads. Godt emne men handlingsvindue uklart eller aktør svær at nå.
-  38-49: Resten. Relevant men generisk, stor aktør, eller ingen klar indgang.
-  0-37: Filtreres væk – ikke relevant.
-  REGLER: Brug præcise tal som 41, 47, 53, 57, 63, 67, 71, 74, 79, 83. ALDRIG runde tal. ALDRIG mere end 2 leads med samme score.",
+  {starred_context}"score": 0-100. Vær meget differentieret og kritisk i din scoring. Brug hele skalaen.
+  NEXTSTEP arbejder primært med SMV'er (10-500 ansatte) der IKKE har intern PA- eller kommunikationskapacitet. Store virksomheder som Novo Nordisk, FLSmidth, Mærsk, DSV og andre med egne kommunikations- eller PA-afdelinger scorer LAVT – de har ikke brug for os.
+  90-100: Ekstraordinært lead. SMV (10-500 ansatte) UDEN intern PA-kapabilitet, akut politisk pres eller lovgivning på vej, klart handlingsvindue NU og identificerbar beslutningstager.
+  75-89: Stærkt lead. Relevant SMV eller brancheorganisation med konkret politisk situation der kræver handling inden for 1-3 måneder.
+  60-74: Godt lead. Relevant emne og aktør men handlingsvinduet er uklart eller aktøren er svær at identificere præcist.
+  41-59: Svagt lead. Relevant emne men stor virksomhed med intern PA, for generisk situation eller ingen klar indgang for NEXTSTEP.
+  0-40: Ikke relevant – store virksomheder med intern PA, rent nyhedsstof uden handlingsvindue, eller emner uden for NEXTSTEPs sektorer.
+  KRITISK VIGTIGT FOR SCORING: Hvert lead skal have sin helt egen unikke score. Tænk på det som en eksaminator der bedømmer individuelle opgaver – ingen to studerende får præcis samme karakter medmindre de har lavet nøjagtigt det samme. Vej hvert lead på dets egne specifikke meritter: styrken af det politiske handlingsvindue, aktørens størrelse og PA-kapacitet, timing og konkrethed. En forskel på bare 1-2 point er bedre end identiske scores.",
   "entity": "primær virksomhed eller organisation (kun ét navn)",
   "size_info": "antal ansatte eller borgere hvis nævnt",
   "stakeholders": [{{"name": "navn", "role": "rolle i sagen"}}],
