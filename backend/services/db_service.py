@@ -19,7 +19,8 @@ async def get_leads(module: str = None, limit: int = 25, sort: str = "score", da
     try:
         from datetime import datetime, timedelta, timezone
         sort_column = "created_at" if sort == "date" else "stars" if sort == "stars" else "score"
-        query = client.table("leads").select("*").gte("score", 38).order(sort_column, desc=True).limit(limit)
+        effective_limit = 50 if days and days >= 30 else limit
+        query = client.table("leads").select("*").gte("score", 38).eq("rapport_sent", False).order(sort_column, desc=True).limit(effective_limit)
         if module:
             query = query.eq("module", module)
         if days:

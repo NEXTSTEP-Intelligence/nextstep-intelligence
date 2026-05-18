@@ -7,7 +7,7 @@ import os
 
 from routers import leads, scraper, reports, settings, klientlinse, mail
 from services.scraper_service import run_scraper
-from services.mail_service import send_approval_request
+from services.mail_service import send_report_to_team
 from services.db_service import cleanup_old_leads
 
 load_dotenv()
@@ -40,7 +40,7 @@ async def maybe_send_missed_approval():
             return
 
         print("Misset godkendelsesmail opdaget – sender nu...")
-        await send_approval_request()
+        await send_report_to_team()
         client.table("mail_log").insert({"mail_type": "approval"}).execute()
     except Exception as e:
         print(f"maybe_send_missed_approval fejl: {e}")
@@ -55,18 +55,18 @@ async def log_approval_sent():
     except Exception as e:
         print(f"log_approval_sent fejl: {e}")
 
-async def send_approval_and_log():
-    await send_approval_request()
+async def send_report_to_team():
+    await send_report_to_team()
     await log_approval_sent()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Scraper hver time
     scheduler.add_job(run_scraper, 'cron', minute=0, id='hourly_scrape')
-    # Godkendelses-mail mandag kl. 10:00
-    scheduler.add_job(send_approval_and_log, 'cron', day_of_week='mon', hour=10, minute=0, id='monday_approval')
-    # Godkendelses-mail torsdag kl. 08:30
-    scheduler.add_job(send_approval_and_log, 'cron', day_of_week='thu', hour=8, minute=30, id='thursday_approval')
+    # Rapport mandag kl. 10:00
+    scheduler.add_job(send_report_to_team, 'cron', day_of_week='mon', hour=10, minute=0, id='monday_rapport')
+    # Rapport torsdag kl. 08:30
+    scheduler.add_job(send_report_to_team, 'cron', day_of_week='thu', hour=8, minute=30, id='thursday_rapport')
     # Oprydning af leads ældre end 90 dage kl. 03:00 hver nat
     scheduler.add_job(cleanup_old_leads, 'cron', hour=3, minute=0, id='daily_cleanup')
     scheduler.start()

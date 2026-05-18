@@ -223,11 +223,19 @@ async def send_approval_request() -> bool:
 
 async def send_report_to_team() -> bool:
     from datetime import datetime
+    from services.db_service import get_client
     now = datetime.now()
     week = int(now.strftime("%V"))
     day_names = {0:"Mandag",1:"Tirsdag",2:"Onsdag",3:"Torsdag",4:"Fredag",5:"Lørdag",6:"Søndag"}
     day_label = day_names.get(now.weekday(), "")
-    leads = await get_leads(limit=20, sort="score", days=7)
+    # Hent kun leads der IKKE allerede er sendt i en rapport
+    all_leads = await get_leads(limit=25, sort="score", days=7)
+    db = get_client()
+    leads = [l for l in all_leads if not l.get("rapport_sent", False)]
+
+    if not leads:
+        print("Ingen nye leads at sende i rapport")
+        return True
 
     success = True
     for recipient in RECIPIENTS:
@@ -241,7 +249,13 @@ async def send_report_to_team() -> bool:
             success = False
 
     if success:
+        # Markér leads som sendt
+        for lead in leads:
+            try:
+                db.table("leads").update({"rapport_sent": True}).eq("id", lead["id"]).execute()
+            except Exception as e:
+                print(f"Fejl ved markering af lead: {e}")
         await reset_all_stars()
-        print("Rapport sendt og stjerner nulstillet")
+        print(f"Rapport sendt med {len(leads)} leads og stjerner nulstillet")
 
     return success
