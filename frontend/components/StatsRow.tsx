@@ -1,9 +1,9 @@
 'use client'
 
-type Props = { total: number; pa: number; vel: number; rebizz: number; onDaysChange: (days: number) => void; activeDays: number; totalByDays?: Record<number, number> }
+type Props = { total: number; pa: number; vel: number; rebizz: number; onDaysChange: (days: number) => void; activeDays: number; totalByDays?: Record<number, number>; maxLeads?: number }
 
-export default function StatsRow({ total, pa, vel, rebizz, onDaysChange, activeDays, totalByDays = {} }: Props) {
-  const MAX_LEADS = 25
+export default function StatsRow({ total, pa, vel, rebizz, onDaysChange, activeDays, totalByDays = {}, maxLeads = 25 }: Props) {
+  const MAX_LEADS = maxLeads
   return (
     <div style={{ marginBottom: 4 }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 8 }}>

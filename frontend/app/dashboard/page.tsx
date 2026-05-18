@@ -251,7 +251,7 @@ export default function Dashboard() {
             onDeactivate={() => { setClientName(''); setClientLeads(null) }}
             onLoading={() => setClientLoading(true)}
           />
-          <StatsRow total={leads.length} pa={pa} vel={vel} rebizz={rebizz} onDaysChange={handleDays} activeDays={activeDays} totalByDays={totalByDays} />
+          <StatsRow total={leads.length} pa={pa} vel={vel} rebizz={rebizz} onDaysChange={handleDays} activeDays={activeDays} totalByDays={totalByDays} maxLeads={activeDays >= 30 ? 50 : 25} />
 
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', margin: '18px 0 10px', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
