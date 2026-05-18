@@ -13,17 +13,65 @@ from services.db_service import cleanup_old_leads
 load_dotenv()
 scheduler = AsyncIOScheduler(timezone="Europe/Copenhagen")
 
+async def maybe_send_missed_approval():
+    """Send godkendelsesmail hvis den blev misset pga. deploy."""
+    try:
+        from datetime import datetime, timezone, timedelta
+        from supabase import create_client
+        import os
+        client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+        now = datetime.now(timezone(timedelta(hours=2)))  # Copenhagen
+        weekday = now.weekday()  # 0=mon, 3=thu
+        hour = now.hour
+        minute = now.minute
+
+        # Tjek om vi er på en rapport-dag og forbi sendetidspunktet
+        is_monday_after = weekday == 0 and (hour > 10 or (hour == 10 and minute >= 0))
+        is_thursday_after = weekday == 3 and (hour > 8 or (hour == 8 and minute >= 30))
+
+        if not (is_monday_after or is_thursday_after):
+            return
+
+        # Tjek om mailen allerede er sendt i dag
+        today = now.date().isoformat()
+        result = client.table("mail_log").select("id").gte("sent_at", today).eq("mail_type", "approval").execute()
+        if result.data:
+            print("Godkendelsesmail allerede sendt i dag – springer over")
+            return
+
+        print("Misset godkendelsesmail opdaget – sender nu...")
+        await send_approval_request()
+        client.table("mail_log").insert({"mail_type": "approval"}).execute()
+    except Exception as e:
+        print(f"maybe_send_missed_approval fejl: {e}")
+
+async def log_approval_sent():
+    """Log at godkendelsesmail er sendt."""
+    try:
+        from supabase import create_client
+        import os
+        client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+        client.table("mail_log").insert({"mail_type": "approval"}).execute()
+    except Exception as e:
+        print(f"log_approval_sent fejl: {e}")
+
+async def send_approval_and_log():
+    await send_approval_request()
+    await log_approval_sent()
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Scraper hver time
     scheduler.add_job(run_scraper, 'cron', minute=0, id='hourly_scrape')
     # Godkendelses-mail mandag kl. 10:00
-    scheduler.add_job(send_approval_request, 'cron', day_of_week='mon', hour=10, minute=0, id='monday_approval')
+    scheduler.add_job(send_approval_and_log, 'cron', day_of_week='mon', hour=10, minute=0, id='monday_approval')
     # Godkendelses-mail torsdag kl. 08:30
-    scheduler.add_job(send_approval_request, 'cron', day_of_week='thu', hour=8, minute=30, id='thursday_approval')
+    scheduler.add_job(send_approval_and_log, 'cron', day_of_week='thu', hour=8, minute=30, id='thursday_approval')
     # Oprydning af leads ældre end 90 dage kl. 03:00 hver nat
     scheduler.add_job(cleanup_old_leads, 'cron', hour=3, minute=0, id='daily_cleanup')
     scheduler.start()
+    # Tjek om vi missede en mail pga. deploy
+    await maybe_send_missed_approval()
     print("Scheduler startet – scraper hver time, godkendelsesmail man 10:00 og tor 08:30, oprydning kl. 03:00")
     yield
     scheduler.shutdown()
