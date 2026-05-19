@@ -209,6 +209,7 @@ SCORING – ABSOLUT KRITISK – du SKAL differentiere markant:
 - SMV uden PA-kapacitet + akut politisk pres + navngiven beslutningstager = 70-85
 - Generiske politiske nyheder uden klar aktør = 38-44
 - Irrelevante artikler = 0-37, relevant: false
+- ALDRIG relevant: rene politiske nyheder om regeringsdannelse, partistrategi, valgresultater eller politiske forhandlinger. En artikel om "Troels Lund danner regering" er IKKE et lead – det er en politisk nyhed uden handlingsvindue for NEXTSTEP.
 {starred_context}
 Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artiklerne ovenfor:
 [
@@ -226,7 +227,7 @@ Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artikler
     "stakeholders": [{{"name": "navn", "role": "rolle"}}],
     "potential_partners": [{{"name": "navn", "role": "hvorfor relevant"}}],
     "gold_matches": [],
-    "opener": "konkret indgangsvinkel til første henvendelse"
+    "opener": "Intern analyse til NEXTSTEP-teamet – IKKE et pitch. Beskriv: (1) hvad NEXTSTEP konkret kan tilbyde baseret på historisk erfaring fra Guldkatalog/aktuelle kunder, (2) hvem der er den rette kontaktperson og hvorfor, (3) hvad timingen er. Skriv som intern note, fx 'NEXTSTEP har tidligere arbejdet med X i lignende situation. Kontakt Y med afsæt i vores erfaring med Z.' Aldrig sælgende sprog."
   }}
 ]"""
 
@@ -331,7 +332,7 @@ Svar KUN med JSON i dette format (eller null hvis ikke relevant):
   "stakeholders": [{{"name": "navn", "role": "rolle i sagen"}}],
   "potential_partners": [{{"name": "navn", "role": "hvorfor relevant"}}],
   "gold_matches": [],
-  "opener": "konkret indgangsvinkel til første henvendelse"
+  "opener": "Intern analyse til NEXTSTEP-teamet – IKKE et pitch. Beskriv hvad NEXTSTEP konkret kan tilbyde baseret på historisk erfaring, hvem der er rette kontakt og hvorfor timingen er god. Skriv som intern note, aldrig sælgende sprog."
 }}"""
 
     try:
