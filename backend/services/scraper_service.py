@@ -79,6 +79,11 @@ RSS_FEEDS = [
     {"name": "Naestved Bladet", "url": "https://www.naestved-bladet.dk/rss"},
     {"name": "Roskilde Avis", "url": "https://www.roskildemediecenter.dk/rss"},
     {"name": "Frederiksvaerk Ugeblad", "url": "https://www.frederiksvaerkugeblad.dk/rss"},
+    {"name": "Altinget Social", "url": "https://www.altinget.dk/rss/social.rss"},
+    {"name": "Altinget Bolig", "url": "https://www.altinget.dk/rss/bolig.rss"},
+    {"name": "Ugebrevet A4", "url": "https://www.ugebreveta4.dk/rss"},
+    {"name": "KL Nyheder", "url": "https://www.kl.dk/rss"},
+    {"name": "Danske Regioner", "url": "https://www.regioner.dk/rss"},
 ]
 
 SECTORS = ["sundhed", "fødevarer", "energi", "forsyning", "klima", "kommuner", "velfærd", "regulering", "miljø", "sociale forhold"]
@@ -209,7 +214,7 @@ SCORING – ABSOLUT KRITISK – du SKAL differentiere markant:
 - SMV uden PA-kapacitet + akut politisk pres + navngiven beslutningstager = 70-85
 - Generiske politiske nyheder uden klar aktør = 38-44
 - Irrelevante artikler = 0-37, relevant: false
-- ALDRIG relevant: rene politiske nyheder om regeringsdannelse, partistrategi, valgresultater eller politiske forhandlinger. En artikel om "Troels Lund danner regering" er IKKE et lead – det er en politisk nyhed uden handlingsvindue for NEXTSTEP.
+- IKKE relevant: rene nationale partipolitiske nyheder om regeringsdannelse, koalitionsforhandlinger eller interne partistrategier uden konkret aktør NEXTSTEP kan hjælpe. Lokale politiske bevægelser (kommunalbestyrelser, regionale beslutninger, lokale camps/processer) er MEGET relevante og skal scores højt hvis der er et klart handlingsvindue.
 {starred_context}
 Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artiklerne ovenfor:
 [
