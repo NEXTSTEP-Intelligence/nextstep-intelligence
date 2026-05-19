@@ -251,6 +251,7 @@ Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artikler
             nr = item.get("artikel_nr", 1) - 1
             if 0 <= nr < len(articles):
                 article = articles[nr]
+                item.pop("artikel_nr", None)
                 item["url"] = article["url"]
                 item["source"] = article["source"]
                 item["published_at"] = article["published"]
