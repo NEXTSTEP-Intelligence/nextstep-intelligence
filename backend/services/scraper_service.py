@@ -207,14 +207,17 @@ NEXTSTEP arbejder med:
 
 Opgavetyper: Alliance (samle aktører), Camp (workshop/faciliteringsproces), Entreprenør (vi driver forandringen frem).
 
-SCORING – ABSOLUT KRITISK – du SKAL differentiere markant:
-- Fordel scores over hele skalaen: de bedste artikler 65-85, middel 45-64, svage 38-44, irrelevante 0-37
-- ALDRIG mere end 2 artikler med identisk score i hele batchen
-- Store virksomheder med intern PA (Novo Nordisk, FLSmidth, Mærsk, DSV, Nordea) scorer ALDRIG over 40
-- SMV uden PA-kapacitet + akut politisk pres + navngiven beslutningstager = 70-85
-- Generiske politiske nyheder uden klar aktør = 38-44
+SCORING – TÆNK SOM EN EKSPERT DER RANGORDNER:
+Før du scorer, skal du rangordne alle artiklerne fra bedst til dårligst. Den bedste artikel får den højeste score, den dårligste den laveste. Spredningen SKAL være mindst 25 points fra højeste til laveste relevante artikel.
+
+Regler:
+- MAX 2 artikler må have samme score i hele batchen – og kun hvis de er næsten identiske i relevans
+- Artikler rangeret #1 og #2 skal have mindst 3 points forskel. #2 og #3 mindst 2 points. Osv.
+- Store virksomheder med intern PA (Novo, FLSmidth, Mærsk, DSV, Nordea) scorer ALDRIG over 40
+- SMV uden PA + akut politisk pres + navngiven beslutningstager = 70-85
+- Generiske nyheder uden klar aktør = 38-50
 - Irrelevante artikler = 0-37, relevant: false
-- IKKE relevant: rene nationale partipolitiske nyheder om regeringsdannelse, koalitionsforhandlinger eller interne partistrategier uden konkret aktør NEXTSTEP kan hjælpe. Lokale politiske bevægelser (kommunalbestyrelser, regionale beslutninger, lokale camps/processer) er MEGET relevante og skal scores højt hvis der er et klart handlingsvindue.
+- IKKE relevant: rene nationale partipolitiske nyheder om regeringsdannelse eller koalitionsforhandlinger. Lokale politiske beslutninger er relevante.
 {starred_context}
 Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artiklerne ovenfor:
 [
