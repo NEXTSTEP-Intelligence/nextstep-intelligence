@@ -29,13 +29,15 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading, is
     setActive(true)
     setActiveClient(clientName)
     onActivate(clientName)
-    setLoading(false)
+    // Loading forbliver true indtil isAnalyzing prop sættes til false udefra
   }
 
   const handleDeactivate = () => {
     sessionStorage.removeItem('klientlinse_client')
     window.location.reload()
   }
+
+  const showLoading = loading || isAnalyzing
 
   return (
     <div style={{
@@ -56,9 +58,9 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading, is
               </div>
             </div>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              {isAnalyzing ? (
+              {showLoading ? (
                 <span style={{ fontSize: 11, color: '#e8d08a', fontStyle: 'italic', opacity: 0.8 }}>
-                  Analyserer leads med AI...
+                  ⏳ Analyserer med NEXTSTEP Intelligences AI...
                 </span>
               ) : (
                 <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>
@@ -70,14 +72,14 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading, is
               </button>
             </div>
           </div>
-          {isAnalyzing && (
+          {showLoading && (
             <div style={{ marginTop: 10, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-              <style>{`
+              <style>{\`
                 @keyframes kl-scan {
                   0% { transform: translateX(-100%); }
                   100% { transform: translateX(400%); }
                 }
-              `}</style>
+              \`}</style>
               <div style={{
                 height: '100%', width: '25%',
                 background: 'linear-gradient(90deg, transparent, #e8d08a, transparent)',
@@ -102,7 +104,7 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading, is
             disabled={loading || !clientName.trim()}
             style={{ fontSize: 12, fontWeight: 500, padding: '7px 16px', borderRadius: 6, border: 'none', background: clientName.trim() ? '#0d1b2e' : 'rgba(0,0,0,0.06)', color: clientName.trim() ? '#e8d08a' : 'var(--ink-3)', cursor: clientName.trim() ? 'pointer' : 'default', whiteSpace: 'nowrap' }}
           >
-            {loading ? '⏳ Analyserer med AI...' : 'Tag deres briller på →'}
+            {loading ? '⏳ Analyserer med NEXTSTEP Intelligences AI...' : 'Tag deres briller på →'}
           </button>
         </div>
       )}
