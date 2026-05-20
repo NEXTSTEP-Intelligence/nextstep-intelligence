@@ -74,12 +74,12 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading, is
           </div>
           {showLoading && (
             <div style={{ marginTop: 10, height: 3, borderRadius: 2, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-              <style>{\`
+              <style>{`
                 @keyframes kl-scan {
                   0% { transform: translateX(-100%); }
                   100% { transform: translateX(400%); }
                 }
-              \`}</style>
+              `}</style>
               <div style={{
                 height: '100%', width: '25%',
                 background: 'linear-gradient(90deg, transparent, #e8d08a, transparent)',
