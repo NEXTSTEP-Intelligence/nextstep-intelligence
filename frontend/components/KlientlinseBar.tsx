@@ -60,7 +60,7 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading, is
             <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               {showLoading ? (
                 <span style={{ fontSize: 11, color: '#e8d08a', fontStyle: 'italic', opacity: 0.8 }}>
-                  ⏳ Analyserer med NEXTSTEP Intelligences AI...
+                  ⏳ Analyserer leads med NEXTSTEP Intelligence AI...
                 </span>
               ) : (
                 <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', fontStyle: 'italic' }}>
@@ -104,7 +104,7 @@ export default function KlientlinseBar({ onActivate, onDeactivate, onLoading, is
             disabled={loading || !clientName.trim()}
             style={{ fontSize: 12, fontWeight: 500, padding: '7px 16px', borderRadius: 6, border: 'none', background: clientName.trim() ? '#0d1b2e' : 'rgba(0,0,0,0.06)', color: clientName.trim() ? '#e8d08a' : 'var(--ink-3)', cursor: clientName.trim() ? 'pointer' : 'default', whiteSpace: 'nowrap' }}
           >
-            {loading ? '⏳ Analyserer med NEXTSTEP Intelligences AI...' : 'Tag deres briller på →'}
+            {loading ? '⏳ Analyserer leads med NEXTSTEP Intelligence AI...' : 'Tag deres briller på →'}
           </button>
         </div>
       )}

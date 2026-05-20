@@ -200,6 +200,9 @@ export default function RapportPage() {
   const week = getWeekNumber(now)
   const dayLabel = getDayLabel(now)
   const starred = leads.filter(l => (l.stars || 0) > 0).sort((a, b) => (b.stars || 0) - (a.stars || 0))
+  const displayedLeads = clientName
+    ? leads.slice(0, 6)
+    : leads.filter(l => (l.stars || 0) === 0).slice(0, starred.length > 0 ? 4 : 6)
   const topLeads = clientName
     ? leads.slice(0, 6)
     : leads.filter(l => (l.stars || 0) === 0).slice(0, starred.length > 0 ? 4 : 6)
@@ -249,6 +252,11 @@ export default function RapportPage() {
         </div>
       )}
       <style>{`
+        @media print {
+          @page { margin: 0; }
+          a[href]:after { content: none !important; }
+        }
+
         @media print { * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
           .no-print { display: none !important; }
           body { background: white !important; }
@@ -316,17 +324,17 @@ export default function RapportPage() {
                   <div style={{ fontSize: 9, letterSpacing: '0.12em', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', marginBottom: 10 }}>
                     Politisk aktivitetskort · Uge {week}
                   </div>
-                  <RadarChart leads={leads} />
+                  <RadarChart leads={displayedLeads} />
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 52, fontWeight: 800, color: 'white', lineHeight: 1, letterSpacing: '-0.03em' }}>{leads.length}</div>
+                  <div style={{ fontSize: 52, fontWeight: 800, color: 'white', lineHeight: 1, letterSpacing: '-0.03em' }}>{displayedLeads.length}</div>
                   <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 4 }}>leads identificeret</div>
                   <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end' }}>
                     <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
-                      <span style={{ color: '#b8963e', fontWeight: 600 }}>{leads.filter(l => l.module === 'public_affairs').length}</span> Public Affairs
+                      <span style={{ color: '#b8963e', fontWeight: 600 }}>{displayedLeads.filter(l => l.module === 'public_affairs').length}</span> Public Affairs
                     </div>
                     <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
-                      <span style={{ color: '#2a9d8f', fontWeight: 600 }}>{leads.filter(l => l.module === 'velfaerd').length}</span> Velfærd
+                      <span style={{ color: '#2a9d8f', fontWeight: 600 }}>{displayedLeads.filter(l => l.module === 'velfaerd').length}</span> Velfærd
                     </div>
                     {!clientName && starred.length > 0 && (
                       <div style={{ fontSize: 11, color: '#b8963e', fontWeight: 600, marginTop: 4 }}>

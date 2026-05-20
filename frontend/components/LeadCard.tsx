@@ -67,7 +67,7 @@ export default function LeadCard({ lead, hideStars }: Props) {
               {lead.client_score ?? lead.score}
             </div>
           </div>
-          <div style={{ fontSize: 14, color: 'var(--ink-3)', transition: 'transform 0.2s', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>↓</div>
+          <div style={{ fontSize: 11, color: 'var(--ink-3)', transition: 'transform 0.2s', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)', marginLeft: 4, opacity: 0.5 }}>›</div>
         </div>
       </div>
 

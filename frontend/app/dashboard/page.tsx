@@ -194,7 +194,7 @@ export default function Dashboard() {
     fetchLeads(s)
   }
 
-  const displayLeads = clientLeads || leads
+  const displayLeads = clientLeads ? clientLeads.filter(l => (l.client_score ?? 0) > 0) : leads
   const filtered = displayLeads.filter(l => {
     if (activeModule === 'pa') return l.module === 'public_affairs'
     if (activeModule === 'vel') return l.module === 'velfaerd'
