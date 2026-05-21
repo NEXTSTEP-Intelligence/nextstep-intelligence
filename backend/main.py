@@ -64,7 +64,7 @@ async def lifespan(app: FastAPI):
     # Scraper hver time
     scheduler.add_job(run_scraper, 'cron', minute=0, id='hourly_scrape')
     # Rapport mandag kl. 10:00
-    scheduler.add_job(send_report_to_team, 'cron', day_of_week='mon', hour=10, minute=0, id='monday_rapport')
+    scheduler.add_job(send_report_to_team, 'cron', day_of_week='mon', hour=8, minute=30, id='monday_rapport')
     # Rapport torsdag kl. 08:30
     scheduler.add_job(send_report_to_team, 'cron', day_of_week='thu', hour=8, minute=30, id='thursday_rapport')
     # Oprydning af leads ældre end 90 dage kl. 03:00 hver nat

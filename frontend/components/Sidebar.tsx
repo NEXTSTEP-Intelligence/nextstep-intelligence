@@ -58,8 +58,7 @@ export default function Sidebar({ activeModule, setActiveModule }: Props) {
         {['Rapport-arkiv', 'Indstillinger'].map(s => (
           <button key={s} style={{ width: '100%', textAlign: 'left', padding: '7px 14px', borderRadius: 8, fontSize: 12, border: 'none', background: 'transparent', color: 'var(--ink-3)', cursor: 'pointer' }}>{s}</button>
         ))}
-        <button style={{ width: '100%', textAlign: 'left', padding: '7px 14px', borderRadius: 8, fontSize: 12, border: 'none', background: 'transparent', color: 'var(--ink-2)', fontWeight: 500, cursor: 'pointer' }}>Afventer godkendelse (1)</button>
-      </div>
+</div>
     </>
   )
 

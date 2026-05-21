@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Sidebar from '@/components/Sidebar'
 import LeadCard from '@/components/LeadCard'
 import StatsRow from '@/components/StatsRow'
-import ReviewBanner from '@/components/ReviewBanner'
 import KlientlinseBar from '@/components/KlientlinseBar'
 
 function getNextRapport(): string {
@@ -243,9 +242,7 @@ export default function Dashboard() {
               Generer rapport ↗
             </button>
           </div>
-
-          <ReviewBanner />
-          <KlientlinseBar
+<KlientlinseBar
             onActivate={(name) => { setClientName(name); applyKlientlinse(name) }}
               isAnalyzing={isAnalyzing}
             onDeactivate={() => { setClientName(''); setClientLeads(null) }}
