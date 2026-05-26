@@ -26,7 +26,7 @@ async def maybe_send_missed_approval():
         minute = now.minute
 
         # Tjek om vi er på en rapport-dag og forbi sendetidspunktet
-        is_monday_after = weekday == 0 and (hour > 10 or (hour == 10 and minute >= 0))
+        is_monday_after = weekday == 0 and (hour > 8 or (hour == 8 and minute >= 30))
         is_thursday_after = weekday == 3 and (hour > 8 or (hour == 8 and minute >= 30))
 
         if not (is_monday_after or is_thursday_after):
@@ -34,14 +34,14 @@ async def maybe_send_missed_approval():
 
         # Tjek om mailen allerede er sendt i dag
         today = now.date().isoformat()
-        result = client.table("mail_log").select("id").gte("sent_at", today).eq("mail_type", "approval").execute()
+        result = client.table("mail_log").select("id").gte("sent_at", today).eq("mail_type", "rapport").execute()
         if result.data:
-            print("Godkendelsesmail allerede sendt i dag – springer over")
+            print("Rapport allerede sendt i dag – springer over")
             return
 
-        print("Misset godkendelsesmail opdaget – sender nu...")
+        print("Misset rapport opdaget – sender nu...")
         await send_report_to_team()
-        client.table("mail_log").insert({"mail_type": "approval"}).execute()
+        client.table("mail_log").insert({"mail_type": "rapport"}).execute()
     except Exception as e:
         print(f"maybe_send_missed_approval fejl: {e}")
 
@@ -55,18 +55,25 @@ async def log_approval_sent():
     except Exception as e:
         print(f"log_approval_sent fejl: {e}")
 
-async def send_report_to_team():
-    await send_report_to_team()
-    await log_approval_sent()
+async def send_rapport_and_log():
+    from services.mail_service import send_report_to_team as _send
+    from supabase import create_client
+    import os
+    await _send()
+    try:
+        client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
+        client.table("mail_log").insert({"mail_type": "rapport"}).execute()
+    except Exception as e:
+        print(f"mail_log fejl: {e}")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Scraper hver time
     scheduler.add_job(run_scraper, 'cron', minute=0, id='hourly_scrape')
     # Rapport mandag kl. 10:00
-    scheduler.add_job(send_report_to_team, 'cron', day_of_week='mon', hour=8, minute=30, id='monday_rapport')
+    scheduler.add_job(send_rapport_and_log, 'cron', day_of_week='mon', hour=8, minute=30, id='monday_rapport')
     # Rapport torsdag kl. 08:30
-    scheduler.add_job(send_report_to_team, 'cron', day_of_week='thu', hour=8, minute=30, id='thursday_rapport')
+    scheduler.add_job(send_rapport_and_log, 'cron', day_of_week='thu', hour=8, minute=30, id='thursday_rapport')
     # Oprydning af leads ældre end 90 dage kl. 03:00 hver nat
     scheduler.add_job(cleanup_old_leads, 'cron', hour=3, minute=0, id='daily_cleanup')
     scheduler.start()
