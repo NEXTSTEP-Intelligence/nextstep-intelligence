@@ -120,15 +120,6 @@ async def run_scraper() -> int:
         batch = all_articles[batch_start:batch_start + BATCH_SIZE]
         print(f"Analyserer batch {batch_start//BATCH_SIZE + 1} ({len(batch)} artikler)...")
         leads = await analyze_articles_batch(batch)
-        # Spred scores matematisk så der ingen dubletter er
-        relevant_leads = [l for l in leads if l and l.get("relevant") and l.get("score", 0) >= 38]
-        relevant_leads.sort(key=lambda x: x.get("score", 0), reverse=True)
-        if len(relevant_leads) > 1:
-            max_s, min_s = 85, 42
-            for idx, lead in enumerate(relevant_leads):
-                spread = max_s - int((max_s - min_s) * idx / (len(relevant_leads) - 1))
-                lead["score"] = spread
-
         for lead in leads:
             if not lead or not lead.get("relevant"):
                 continue
@@ -157,6 +148,24 @@ async def run_scraper() -> int:
                     lead["size_info"] = "Offentlig instans"
                 await save_lead(lead)
                 new_leads += 1
+
+    # Spred scores på tværs af alle nye leads fra denne kørsel
+    if new_leads > 0:
+        try:
+            from services.db_service import get_client
+            from datetime import datetime, timezone, timedelta
+            db = get_client()
+            cutoff = (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat()
+            result = db.table("leads").select("id,score").gte("created_at", cutoff).order("score", desc=True).execute()
+            fresh = result.data or []
+            if len(fresh) > 1:
+                max_s, min_s = 83, 44
+                for idx, lead in enumerate(fresh):
+                    new_score = max_s - int((max_s - min_s) * idx / (len(fresh) - 1))
+                    db.table("leads").update({"score": new_score}).eq("id", lead["id"]).execute()
+                print(f"Scores spredt: {max_s} til {min_s} over {len(fresh)} leads")
+        except Exception as e:
+            print(f"Score-spredning fejl: {e}")
 
     print(f"Scraper færdig: {new_leads} nye leads fundet af {len(all_articles)} artikler")
     return new_leads
