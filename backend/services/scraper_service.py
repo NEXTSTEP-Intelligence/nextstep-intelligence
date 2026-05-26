@@ -120,6 +120,15 @@ async def run_scraper() -> int:
         batch = all_articles[batch_start:batch_start + BATCH_SIZE]
         print(f"Analyserer batch {batch_start//BATCH_SIZE + 1} ({len(batch)} artikler)...")
         leads = await analyze_articles_batch(batch)
+        # Spred scores matematisk så der ingen dubletter er
+        relevant_leads = [l for l in leads if l and l.get("relevant") and l.get("score", 0) >= 38]
+        relevant_leads.sort(key=lambda x: x.get("score", 0), reverse=True)
+        if len(relevant_leads) > 1:
+            max_s, min_s = 85, 42
+            for idx, lead in enumerate(relevant_leads):
+                spread = max_s - int((max_s - min_s) * idx / (len(relevant_leads) - 1))
+                lead["score"] = spread
+
         for lead in leads:
             if not lead or not lead.get("relevant"):
                 continue
