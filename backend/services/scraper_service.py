@@ -153,7 +153,6 @@ async def run_scraper() -> int:
     if new_leads > 0:
         try:
             from services.db_service import get_client
-            from datetime import datetime, timezone, timedelta
             db = get_client()
             cutoff = (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat()
             result = db.table("leads").select("id,score").gte("created_at", cutoff).order("score", desc=True).execute()
