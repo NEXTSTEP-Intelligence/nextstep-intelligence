@@ -301,7 +301,7 @@ export default function Dashboard() {
           </div>
 
           {isLoading ? (
-            <div style={{ padding: '60px 0' }} />
+            <div style={{ textAlign: "center", padding: "60px 0", color: "var(--ink-3)", fontSize: 13 }}>⏳ Henter og analyserer leads...</div>
           ) : clientLoading ? (
             <div style={{ textAlign: 'center', padding: 40, color: 'var(--ink-3)', fontSize: 13 }}>⏳ Analyserer leads fra {clientName}s perspektiv...</div>
           ) : leadsWithFormattedDates.map(lead => <LeadCard key={lead.id} lead={lead} hideStars={!!clientLeads} />)}
