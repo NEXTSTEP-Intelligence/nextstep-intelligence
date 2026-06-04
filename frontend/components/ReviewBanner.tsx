@@ -7,10 +7,10 @@ function getNextSendTime(): Date {
   const day = now.getDay() // 0=søn, 1=man, ..., 4=tor
   const candidates: Date[] = []
 
-  // Mandag kl. 10:00
+  // Mandag kl. 08:30
   const mon = new Date(now)
   mon.setDate(now.getDate() + ((1 - day + 7) % 7))
-  mon.setHours(10, 0, 0, 0)
+  mon.setHours(8, 30, 0, 0)
   if (mon > now) candidates.push(new Date(mon))
 
   // Torsdag kl. 08:30
