@@ -149,23 +149,6 @@ async def run_scraper() -> int:
                 await save_lead(lead)
                 new_leads += 1
 
-    # Spred scores på tværs af alle nye leads fra denne kørsel
-    if new_leads > 0:
-        try:
-            from services.db_service import get_client
-            db = get_client()
-            cutoff = (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat()
-            result = db.table("leads").select("id,score").gte("created_at", cutoff).order("score", desc=True).execute()
-            fresh = result.data or []
-            if len(fresh) > 1:
-                max_s, min_s = 83, 44
-                for idx, lead in enumerate(fresh):
-                    new_score = max_s - int((max_s - min_s) * idx / (len(fresh) - 1))
-                    db.table("leads").update({"score": new_score}).eq("id", lead["id"]).execute()
-                print(f"Scores spredt: {max_s} til {min_s} over {len(fresh)} leads")
-        except Exception as e:
-            print(f"Score-spredning fejl: {e}")
-
     print(f"Scraper færdig: {new_leads} nye leads fundet af {len(all_articles)} artikler")
     return new_leads
 
