@@ -54,6 +54,7 @@ export default function Sidebar({ activeModule, setActiveModule }: Props) {
           </button>
         ))}
       </div>
+    </>
   )
 
   return (
