@@ -206,17 +206,21 @@ NEXTSTEP arbejder med:
 
 Opgavetyper: Alliance (samle aktører), Camp (workshop/faciliteringsproces), Entreprenør (vi driver forandringen frem).
 
-SCORING – TÆNK SOM EN EKSPERT DER RANGORDNER:
-Før du scorer, skal du rangordne alle artiklerne fra bedst til dårligst. Den bedste artikel får den højeste score, den dårligste den laveste. Spredningen SKAL være mindst 25 points fra højeste til laveste relevante artikel.
+SCORING – RANGORDNING OG DIFFERENTIERING:
+Rangordner alle artikler fra bedst til dårligst FØR du scorer. Tildel derefter scores der afspejler denne rangorden præcist.
 
-Regler:
-- MAX 2 artikler må have samme score i hele batchen – og kun hvis de er næsten identiske i relevans
-- Artikler rangeret #1 og #2 skal have mindst 3 points forskel. #2 og #3 mindst 2 points. Osv.
-- Store virksomheder med intern PA (Novo, FLSmidth, Mærsk, DSV, Nordea) scorer ALDRIG over 40
-- SMV uden PA + akut politisk pres + navngiven beslutningstager = 70-85
-- Generiske nyheder uden klar aktør = 38-50
-- Irrelevante artikler = 0-37, relevant: false
-- IKKE relevant: rene nationale partipolitiske nyheder om regeringsdannelse eller koalitionsforhandlinger. Lokale politiske beslutninger er relevante.
+SCORE-SKALA:
+90-100: Perfekt lead. Lille/mellemstor organisation (under 500 ansatte) UDEN intern PA, lovgivning eller regulering der rammer dem akut lige nu, navngiven beslutningstager identificeret, NEXTSTEP har direkte erfaring fra Guldkatalog. Eksempel: En kommunal psykiatriafdeling der netop har fået tilsyn og mangler en plan.
+75-89: Stærkt lead. Relevant organisation, konkret politisk situation, handlingsvindue inden for 1-2 måneder. Eksempel: En brancheorganisation der reagerer på ny regulering.
+60-74: Godt lead. Relevant emne men aktøren er uklar eller handlingsvinduet er ikke akut. Eksempel: En generel debat om et emne NEXTSTEP arbejder med.
+41-59: Svagt lead. Stort emne men ingen klar indgang, eller stor virksomhed med intern PA-kapacitet.
+0-40: Ikke relevant. Store C20-virksomheder, rene partipolitiske nyheder, emner uden for NEXTSTEPs sektorer.
+
+HÅRD REGLER:
+- Hver artikel SKAL have en unik score – identiske scores er kun tilladt hvis to artikler er næsten ens
+- Spredning på mindst 30 points fra højeste til laveste relevante artikel i batchen
+- Store virksomheder med intern PA (Novo, Mærsk, DSV, FLSmidth, Nordea) scorer MAX 40
+- IKKE relevant: rene nationale partipolitiske nyheder om regeringsdannelse. Lokale politiske beslutninger er relevante.
 {starred_context}
 Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artiklerne ovenfor:
 [
