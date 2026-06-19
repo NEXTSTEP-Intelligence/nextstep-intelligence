@@ -114,6 +114,21 @@ async def run_scraper() -> int:
         except Exception as e:
             print(f"Fejl ved hentning af {feed_info['name']}: {e}")
 
+    # Konservativt pre-filter: fjern oplagt irrelevante artikler før Claude-kald
+    EXCLUDE_KEYWORDS = [
+        "fodbold", "håndbold", "superliga", "champions league", "ol ", "vm ",
+        "horoskop", "vejret", "vejrudsigt", "afsløring fra realityserie",
+        "kendis", "paradise hotel", "bachelor", "x factor", "melodi grand prix",
+    ]
+    before_count = len(all_articles)
+    all_articles = [
+        a for a in all_articles
+        if not any(kw in (a.get("title", "") + " " + a.get("summary", "")).lower() for kw in EXCLUDE_KEYWORDS)
+    ]
+    filtered_out = before_count - len(all_articles)
+    if filtered_out:
+        print(f"Pre-filter fjernede {filtered_out} oplagt irrelevante artikler")
+
     # Analyser i batches af 8 for at tvinge relativ scoring
     BATCH_SIZE = 25
     for batch_start in range(0, len(all_articles), BATCH_SIZE):
