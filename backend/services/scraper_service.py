@@ -2,7 +2,7 @@ import feedparser
 import anthropic
 import json
 import os
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from services.db_service import save_lead, article_exists, find_existing_lead, update_lead, find_similar_leads, search_guldkatalog
 from services.cvr_service import lookup_cvr
 
@@ -114,23 +114,8 @@ async def run_scraper() -> int:
         except Exception as e:
             print(f"Fejl ved hentning af {feed_info['name']}: {e}")
 
-    # Konservativt pre-filter: fjern oplagt irrelevante artikler før Claude-kald
-    EXCLUDE_KEYWORDS = [
-        "fodbold", "håndbold", "superliga", "champions league", "ol ", "vm ",
-        "horoskop", "vejret", "vejrudsigt", "afsløring fra realityserie",
-        "kendis", "paradise hotel", "bachelor", "x factor", "melodi grand prix",
-    ]
-    before_count = len(all_articles)
-    all_articles = [
-        a for a in all_articles
-        if not any(kw in (a.get("title", "") + " " + a.get("summary", "")).lower() for kw in EXCLUDE_KEYWORDS)
-    ]
-    filtered_out = before_count - len(all_articles)
-    if filtered_out:
-        print(f"Pre-filter fjernede {filtered_out} oplagt irrelevante artikler")
-
     # Analyser i batches af 8 for at tvinge relativ scoring
-    BATCH_SIZE = 25
+    BATCH_SIZE = 8
     for batch_start in range(0, len(all_articles), BATCH_SIZE):
         batch = all_articles[batch_start:batch_start + BATCH_SIZE]
         print(f"Analyserer batch {batch_start//BATCH_SIZE + 1} ({len(batch)} artikler)...")
@@ -164,10 +149,29 @@ async def run_scraper() -> int:
                 await save_lead(lead)
                 new_leads += 1
 
+    # Spred scores på tværs af alle nye leads fra denne kørsel
+    if new_leads > 0:
+        try:
+            from services.db_service import get_client
+            from datetime import datetime, timezone, timedelta
+            db = get_client()
+            cutoff = (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat()
+            result = db.table("leads").select("id,score").gte("created_at", cutoff).order("score", desc=True).execute()
+            fresh = result.data or []
+            if len(fresh) > 1:
+                max_s, min_s = 83, 44
+                for idx, lead in enumerate(fresh):
+                    new_score = max_s - int((max_s - min_s) * idx / (len(fresh) - 1))
+                    db.table("leads").update({"score": new_score}).eq("id", lead["id"]).execute()
+                print(f"Scores spredt: {max_s} til {min_s} over {len(fresh)} leads")
+        except Exception as e:
+            print(f"Score-spredning fejl: {e}")
+
     print(f"Scraper færdig: {new_leads} nye leads fundet af {len(all_articles)} artikler")
     return new_leads
 
 async def get_starred_examples() -> str:
+    from services.db_service import get_leads
     try:
         leads = await get_leads(sort="stars", limit=3)
         starred = [l for l in leads if (l.get("stars") or 0) > 0]
@@ -221,21 +225,17 @@ NEXTSTEP arbejder med:
 
 Opgavetyper: Alliance (samle aktører), Camp (workshop/faciliteringsproces), Entreprenør (vi driver forandringen frem).
 
-SCORING – RANGORDNING OG DIFFERENTIERING:
-Rangordner alle artikler fra bedst til dårligst FØR du scorer. Tildel derefter scores der afspejler denne rangorden præcist.
+SCORING – TÆNK SOM EN EKSPERT DER RANGORDNER:
+Før du scorer, skal du rangordne alle artiklerne fra bedst til dårligst. Den bedste artikel får den højeste score, den dårligste den laveste. Spredningen SKAL være mindst 25 points fra højeste til laveste relevante artikel.
 
-SCORE-SKALA:
-90-100: Perfekt lead. Lille/mellemstor organisation (under 500 ansatte) UDEN intern PA, lovgivning eller regulering der rammer dem akut lige nu, navngiven beslutningstager identificeret, NEXTSTEP har direkte erfaring fra Guldkatalog. Eksempel: En kommunal psykiatriafdeling der netop har fået tilsyn og mangler en plan.
-75-89: Stærkt lead. Relevant organisation, konkret politisk situation, handlingsvindue inden for 1-2 måneder. Eksempel: En brancheorganisation der reagerer på ny regulering.
-60-74: Godt lead. Relevant emne men aktøren er uklar eller handlingsvinduet er ikke akut. Eksempel: En generel debat om et emne NEXTSTEP arbejder med.
-41-59: Svagt lead. Stort emne men ingen klar indgang, eller stor virksomhed med intern PA-kapacitet.
-0-40: Ikke relevant. Store C20-virksomheder, rene partipolitiske nyheder, emner uden for NEXTSTEPs sektorer.
-
-HÅRD REGLER:
-- Hver artikel SKAL have en unik score – identiske scores er kun tilladt hvis to artikler er næsten ens
-- Spredning på mindst 30 points fra højeste til laveste relevante artikel i batchen
-- Store virksomheder med intern PA (Novo, Mærsk, DSV, FLSmidth, Nordea) scorer MAX 40
-- IKKE relevant: rene nationale partipolitiske nyheder om regeringsdannelse. Lokale politiske beslutninger er relevante.
+Regler:
+- MAX 2 artikler må have samme score i hele batchen – og kun hvis de er næsten identiske i relevans
+- Artikler rangeret #1 og #2 skal have mindst 3 points forskel. #2 og #3 mindst 2 points. Osv.
+- Store virksomheder med intern PA (Novo, FLSmidth, Mærsk, DSV, Nordea) scorer ALDRIG over 40
+- SMV uden PA + akut politisk pres + navngiven beslutningstager = 70-85
+- Generiske nyheder uden klar aktør = 38-50
+- Irrelevante artikler = 0-37, relevant: false
+- IKKE relevant: rene nationale partipolitiske nyheder om regeringsdannelse eller koalitionsforhandlinger. Lokale politiske beslutninger er relevante.
 {starred_context}
 Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artiklerne ovenfor:
 [
@@ -259,10 +259,26 @@ Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artikler
 
     try:
         client = get_anthropic_client()
+        static_part = prompt[:prompt.index("ARTIKEL 1:")]
+        dynamic_part = prompt[prompt.index("ARTIKEL 1:"):]
+
         response = client.messages.create(
             model="claude-sonnet-4-6",
-            max_tokens=8000,
-            messages=[{"role": "user", "content": prompt}]
+            max_tokens=2500,
+            messages=[{
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": static_part,
+                        "cache_control": {"type": "ephemeral"}
+                    },
+                    {
+                        "type": "text",
+                        "text": dynamic_part
+                    }
+                ]
+            }]
         )
         text = response.content[0].text.strip()
         if text.startswith("```"):
@@ -301,6 +317,7 @@ async def analyze_article(article: dict) -> dict | None:
     if similar:
         historical_context = "\n\nHISTORISK KONTEKST – tidligere leads på samme emne/aktør:\n"
         for s in similar:
+            from datetime import datetime, timezone
             try:
                 dato = datetime.fromisoformat(s['created_at'].replace('Z', '+00:00'))
                 dage = (datetime.now(timezone.utc) - dato).days
