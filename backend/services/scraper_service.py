@@ -1,8 +1,8 @@
+from datetime import datetime, timezone, timedelta
 import feedparser
 import anthropic
 import json
 import os
-from datetime import datetime
 from services.db_service import save_lead, article_exists, find_existing_lead, update_lead, find_similar_leads, search_guldkatalog
 from services.cvr_service import lookup_cvr
 
@@ -153,7 +153,6 @@ async def run_scraper() -> int:
     if new_leads > 0:
         try:
             from services.db_service import get_client
-            from datetime import datetime, timezone, timedelta
             db = get_client()
             cutoff = (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat()
             result = db.table("leads").select("id,score").gte("created_at", cutoff).order("score", desc=True).execute()
@@ -317,7 +316,6 @@ async def analyze_article(article: dict) -> dict | None:
     if similar:
         historical_context = "\n\nHISTORISK KONTEKST – tidligere leads på samme emne/aktør:\n"
         for s in similar:
-            from datetime import datetime, timezone
             try:
                 dato = datetime.fromisoformat(s['created_at'].replace('Z', '+00:00'))
                 dage = (datetime.now(timezone.utc) - dato).days
