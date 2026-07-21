@@ -115,7 +115,7 @@ async def run_scraper() -> int:
             print(f"Fejl ved hentning af {feed_info['name']}: {e}")
 
     # Analyser i batches af 8 for at tvinge relativ scoring
-    BATCH_SIZE = 25
+    BATCH_SIZE = 15
     for batch_start in range(0, len(all_articles), BATCH_SIZE):
         batch = all_articles[batch_start:batch_start + BATCH_SIZE]
         print(f"Analyserer batch {batch_start//BATCH_SIZE + 1} ({len(batch)} artikler)...")
