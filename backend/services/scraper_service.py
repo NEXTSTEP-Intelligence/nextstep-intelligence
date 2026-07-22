@@ -252,7 +252,7 @@ Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artikler
     "stakeholders": [{{"name": "navn", "role": "rolle"}}],
     "potential_partners": [{{"name": "navn", "role": "hvorfor relevant"}}],
     "gold_matches": [],
-    "opener": "Intern analyse til NEXTSTEP-teamet – IKKE et pitch. Beskriv: (1) hvad NEXTSTEP konkret kan tilbyde baseret på historisk erfaring fra Guldkatalog/aktuelle kunder, (2) hvem der er den rette kontaktperson og hvorfor, (3) hvad timingen er. Skriv som intern note, fx 'NEXTSTEP har tidligere arbejdet med X i lignende situation. Kontakt Y med afsæt i vores erfaring med Z.' Aldrig sælgende sprog."
+    "opener": "Intern analyse til NEXTSTEP-teamet – MAX 2 sætninger. Hvad kan NEXTSTEP tilbyde og hvem kontaktes. Aldrig sælgende sprog."
   }}
 ]"""
 
