@@ -36,8 +36,8 @@ async def send_rapport_and_log():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Scraper hver time
-    scheduler.add_job(run_scraper, 'cron', hour='0,4,8,12,16,20', minute=0, id='every_4h_scrape', max_instances=1, misfire_grace_time=300)
+    # Scraper hver 12. time
+    scheduler.add_job(run_scraper, 'cron', hour='6,18', minute=0, id='every_12h_scrape', max_instances=1, misfire_grace_time=300)
     # Rapport mandag kl. 10:00
     scheduler.add_job(send_rapport_and_log, 'cron', day_of_week='mon', hour=8, minute=30, id='monday_rapport')
     # Rapport torsdag kl. 08:30
@@ -46,7 +46,7 @@ async def lifespan(app: FastAPI):
     scheduler.add_job(cleanup_old_leads, 'cron', hour=3, minute=0, id='daily_cleanup')
     scheduler.start()
     # Tjek om vi missede en mail pga. deploy
-    print("Scheduler startet – scraper hver time, godkendelsesmail man 10:00 og tor 08:30, oprydning kl. 03:00")
+    print("Scheduler startet – scraper hver 12. time, godkendelsesmail man 10:00 og tor 08:30, oprydning kl. 03:00")
     yield
     scheduler.shutdown()
 
