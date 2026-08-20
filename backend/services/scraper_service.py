@@ -165,12 +165,39 @@ async def get_starred_examples() -> str:
         return ""
 
 
+async def get_recent_scoring_context() -> str:
+    """Giver batch-analysen indblik i scores fra tidligere, uafhængige kørsler.
+
+    Hver batch tvinges kun til spredning internt – uden dette ankerpunkt har
+    modellen ingen viden om at fx et andet lead 3 timer forinden også fik 67,
+    og batches konvergerer uafhængigt af hinanden mod de samme 'sikre' tal.
+    """
+    from services.db_service import get_client
+    try:
+        db = get_client()
+        if not db:
+            return ""
+        result = db.table("leads").select("title,score,sector").order("created_at", desc=True).limit(20).execute()
+        recent = result.data or []
+        if not recent:
+            return ""
+        examples = "\n".join([f'- "{l["title"][:60]}" → {l["score"]} ({l.get("sector", "")})' for l in recent])
+        return f"""
+SENESTE SCORES FRA TIDLIGERE, UAFHÆNGIGE KØRSLER (kun til reference):
+{examples}
+VIGTIGT: Disse er scoret i separate kørsler uden kendskab til hinanden, så de kan være unødigt ens. Lad være med blot at gentage de samme tal – brug hele 0-100 skalaen ud fra artiklens egne meritter. Er en artikel i denne batch et markant stærkere lead end noget ovenfor (akut handlingsvindue, navngiven beslutningstager, ingen intern PA-kapacitet), så giv den en score i 80-100-området. Er den markant svagere, score den tilsvarende lavt.
+"""
+    except Exception:
+        return ""
+
+
 async def analyze_articles_batch(articles: list) -> list:
     """Analyser en batch af artikler på én gang og tving relativ scoring."""
     if not articles:
         return []
 
     starred_context = await get_starred_examples()
+    recent_scoring_context = await get_recent_scoring_context()
 
     # Byg RAG-kontekst for hele batchen
     rag_context = ""
@@ -218,7 +245,7 @@ Regler:
 - Generiske nyheder uden klar aktør = 38-50
 - Irrelevante artikler = 0-37, relevant: false
 - IKKE relevant: rene nationale partipolitiske nyheder om regeringsdannelse eller koalitionsforhandlinger. Lokale politiske beslutninger er relevante.
-{starred_context}
+{recent_scoring_context}{starred_context}
 Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artiklerne ovenfor:
 [
   {{
