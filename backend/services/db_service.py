@@ -52,6 +52,30 @@ async def article_exists(url: str) -> bool:
     except:
         return False
 
+async def get_seen_urls(urls: list) -> set:
+    """URL'er scraperen allerede har analyseret, også dem der blev vurderet irrelevante."""
+    client = get_client()
+    if not client or not urls:
+        return set()
+    seen = set()
+    try:
+        for i in range(0, len(urls), 100):
+            chunk = urls[i:i + 100]
+            result = client.table("seen_articles").select("url").in_("url", chunk).execute()
+            seen.update(row["url"] for row in (result.data or []))
+    except Exception as e:
+        print(f"Seen-opslag fejl (mangler tabellen seen_articles?): {e}")
+    return seen
+
+async def mark_articles_seen(urls: list) -> None:
+    client = get_client()
+    if not client or not urls:
+        return
+    try:
+        client.table("seen_articles").upsert([{"url": u} for u in urls], on_conflict="url", ignore_duplicates=True).execute()
+    except Exception as e:
+        print(f"Seen-markering fejl (mangler tabellen seen_articles?): {e}")
+
 async def toggle_star(lead_id: str, currently_starred: bool) -> dict:
     client = get_client()
     if not client:
@@ -138,6 +162,11 @@ async def cleanup_old_leads() -> int:
         result = client.table("leads").delete().lt("created_at", cutoff).eq("stars", 0).execute()
         count = len(result.data) if result.data else 0
         print(f"Oprydning: {count} leads ældre end 90 dage slettet")
+        try:
+            seen_cutoff = (datetime.now(timezone.utc) - timedelta(days=60)).isoformat()
+            client.table("seen_articles").delete().lt("created_at", seen_cutoff).execute()
+        except Exception as e:
+            print(f"Oprydning af seen_articles fejl: {e}")
         return count
     except Exception as e:
         print(f"Oprydning fejl: {e}")

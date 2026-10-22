@@ -3,7 +3,7 @@ import feedparser
 import anthropic
 import json
 import os
-from services.db_service import save_lead, article_exists, find_existing_lead, update_lead, find_similar_leads, search_guldkatalog
+from services.db_service import save_lead, article_exists, find_existing_lead, update_lead, find_similar_leads, search_guldkatalog, get_seen_urls, mark_articles_seen
 from services.cvr_service import lookup_cvr
 
 # Danske nyhedskilder - RSS feeds
@@ -93,7 +93,7 @@ def get_anthropic_client():
 
 async def run_scraper() -> int:
     new_leads = 0
-    all_articles = []
+    candidates = []
     seen_urls = set()
 
     for feed_info in RSS_FEEDS:
@@ -108,11 +108,19 @@ async def run_scraper() -> int:
                     "published": entry.get("published", str(datetime.now())),
                     "published_parsed": entry.get("published_parsed", None),
                 }
-                if article["title"] and article["url"] not in seen_urls and not await article_exists(article["url"]):
-                    all_articles.append(article)
+                if article["title"] and article["url"] and article["url"] not in seen_urls:
+                    candidates.append(article)
                     seen_urls.add(article["url"])
         except Exception as e:
             print(f"Fejl ved hentning af {feed_info['name']}: {e}")
+
+    # Spring artikler over, vi allerede har analyseret – også de irrelevante, som ikke er gemt som leads
+    already_seen = await get_seen_urls([a["url"] for a in candidates])
+    all_articles = [
+        a for a in candidates
+        if a["url"] not in already_seen and not await article_exists(a["url"])
+    ]
+    print(f"{len(candidates)} artikler i feeds, {len(all_articles)} nye at analysere")
 
     # Analyser i batches af 8 for at tvinge relativ scoring
     BATCH_SIZE = 15
@@ -148,6 +156,9 @@ async def run_scraper() -> int:
                     lead["size_info"] = "Offentlig instans"
                 await save_lead(lead)
                 new_leads += 1
+
+        # Marker først som set, når analysen er lykkedes – mislykkede batches prøves igen næste kørsel
+        await mark_articles_seen([l["url"] for l in leads if l and l.get("url")])
 
     print(f"Scraper færdig: {new_leads} nye leads fundet af {len(all_articles)} artikler")
     return new_leads
@@ -246,7 +257,9 @@ Regler:
 - Irrelevante artikler = 0-37, relevant: false
 - IKKE relevant: rene nationale partipolitiske nyheder om regeringsdannelse eller koalitionsforhandlinger. Lokale politiske beslutninger er relevante.
 {recent_scoring_context}{starred_context}
-Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artiklerne ovenfor:
+Svar med et kompakt JSON-array (uden indrykning og uden tekst uden for JSON) – ét objekt per artikel i samme rækkefølge som artiklerne ovenfor.
+For artikler der IKKE er relevante: returner KUN {{"artikel_nr": N, "relevant": false, "score": X}} – ingen andre felter.
+For relevante artikler bruger du dette format:
 [
   {{
     "artikel_nr": 1,
@@ -273,7 +286,7 @@ Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artikler
 
         response = client.messages.create(
             model="claude-sonnet-4-6",
-            max_tokens=2500,
+            max_tokens=6000,
             messages=[{
                 "role": "user",
                 "content": [
@@ -289,6 +302,11 @@ Svar med JSON-array – ét objekt per artikel i samme rækkefølge som artikler
                 ]
             }]
         )
+        if response.stop_reason == "max_tokens" and len(articles) > 1:
+            # Afkortet JSON kan ikke parses – del batchen i to i stedet for at miste alle artiklerne
+            mid = len(articles) // 2
+            print(f"Batch afkortet ved max_tokens – deler {len(articles)} artikler i to")
+            return await analyze_articles_batch(articles[:mid]) + await analyze_articles_batch(articles[mid:])
         text = response.content[0].text.strip()
         if text.startswith("```"):
             text = text.split("```")[1]

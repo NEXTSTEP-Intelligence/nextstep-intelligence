@@ -67,12 +67,13 @@ def rescore_all_leads():
     since = (datetime.now(timezone.utc) - timedelta(days=DAYS)).isoformat()
     result = (
         client.table("leads")
-        .select("id,title,summary,sector,module,entity,size_info,score,created_at")
+        .select("id,title,summary,sector,module,entity,size_info,score,created_at,updated_at")
         .gte("created_at", since)
         .execute()
     )
-    leads = result.data or []
-    print(f"Fandt {len(leads)} leads under {DAYS} dage til re-scoring.\n")
+    all_leads = result.data or []
+    leads = [l for l in all_leads if l.get("updated_at") == l.get("created_at")]
+    print(f"Fandt {len(all_leads)} leads under {DAYS} dage, heraf {len(leads)} ikke tidligere genscoret.\n")
 
     if not leads:
         return
