@@ -12,6 +12,10 @@ create index if not exists seen_articles_created_at_idx
 
 alter table public.seen_articles enable row level security;
 
+-- Nyere Supabase-projekter giver ikke automatisk rollen "anon" adgang til tabeller
+-- oprettet via SQL Editor, så rettighederne skal gives eksplicit.
+grant select, insert, delete on public.seen_articles to anon;
+
 -- Backend'en bruger i dag en Publishable key (rollen "anon"), så den skal have
 -- adgang her. Skifter backend'en senere til en Secret key (som går uden om RLS),
 -- kan de tre politikker herunder slettes, så tabellen er helt lukket udefra.
